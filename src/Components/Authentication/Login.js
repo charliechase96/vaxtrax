@@ -20,11 +20,12 @@ function Login() {
                     <label>Username</label>
                     <input 
                         type="email" 
-                        placeholder="Enter username" 
+                        placeholder="Enter email" 
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         required 
                     />
+                    <label>Password</label>
                     <input 
                         type="password" 
                         placeholder="Enter password" 
