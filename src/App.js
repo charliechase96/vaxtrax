@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Components/Authentication/Login';
 import Signup from './Components/Authentication/Signup';
-import UserProfile from './Components/User/UserProfile';
+import Home from './Components/User/Home';
 
 function App() {
 
@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
         <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
-        <Route path="/home" element={<UserProfile />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
