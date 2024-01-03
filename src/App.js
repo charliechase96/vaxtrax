@@ -5,12 +5,17 @@ import Signup from './Components/Authentication/Signup';
 import UserProfile from './Components/User/UserProfile';
 
 function App() {
+
+  function handleSuccess(token) {
+    localStorage.setItem('authToken', token);
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        {/* <Route path="/userprofile/:userId" element={<UserProfile />} /> */}
+        <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
+        <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
+        <Route path="/home" element={<UserProfile />} />
       </Routes>
     </BrowserRouter>
   );

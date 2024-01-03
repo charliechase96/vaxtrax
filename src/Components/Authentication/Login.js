@@ -1,15 +1,40 @@
 import React, { useState }from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Signup from './Signup';
 import Footer from '../Footer/Footer';
 
-function Login() {
+function Login({onLoginSuccess}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    function handleLogin() {
-        console.log("Login successful!")
-    }
+    const navigate = useNavigate();
+    const authToken = localStorage.getItem('authToken');
+
+    function handleLogin(event) {
+        event.preventDefault();
+        fetch('http://localhost:5000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ email, password }),
+        })
+        .then(response => {
+            if(response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not okay.');
+        })
+        .then(data => {
+            onLoginSuccess(data);
+            navigate('/home');
+        })
+        .catch(error => {
+            setError('Failed to login')
+            console.log(error)});
+    };
 
     return (
         <>
@@ -47,6 +72,7 @@ function Login() {
                 >
                     New user? Create an account!
                 </Link>
+                {error && <div>{error}</div>}
             </div>
             <Footer />
         </>

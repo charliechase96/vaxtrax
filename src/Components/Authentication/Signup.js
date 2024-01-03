@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Login from './Login';
 import Footer from '../Footer/Footer';
 
 
-function Signup() {
+function Signup({onSignupSuccess}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState('');
 
-    function handleSignup() {
-        console.log("Signup successful!");
-    }
+    const navigate = useNavigate();
+    const authToken = localStorage.getItem('authToken');
+
+    function handleSignup(event) {
+        event.preventDefault();
+        fetch('http://localhost:5000/api/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ email, password }),
+        })
+        .then(response => {
+            if(response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not okay.');
+        })
+        .then(data => {
+            onSignupSuccess(data);
+            navigate('/home');
+        })
+        .catch(error => {
+            setError('Failed to signup')
+            console.log(error)});
+    };
 
     return (
         <>
@@ -48,6 +73,7 @@ function Signup() {
                 >
                     Already have an account? Log in!
                 </Link>
+                {error && <div>{error}</div>}
             </div>
             <Footer />
         </>
