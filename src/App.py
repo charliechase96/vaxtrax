@@ -12,7 +12,7 @@ db.init_app(app)
 jwt = JWTManager(app)
 CORS(app, resources={
     r"/api/*": {
-        "origins": "https://vaxtrax.pet",
+        "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
         "methods": ["GET", "POST", "PUT", "DELETE"],
         "allow_headers": ["Content-Type", "Authorization"]
         }
