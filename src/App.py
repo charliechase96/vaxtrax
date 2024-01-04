@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models.user import User, db
+from models.pet import Pet
 from config import Config
 from flask_cors import CORS
 
@@ -43,6 +44,24 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'Registered successfully!'}), 201
+
+@app.route('/api/add_pet', methods=['POST'])
+def add_pet():
+    data = request.get_json()
+    new_pet = Pet(
+        img_url=data['img_url'],
+        name=data['name'],
+        type=data['type'],
+        breed=data['breed'],
+        birthday=data['birthday']
+    )
+    db.session.add(new_pet)
+    try:
+        db.session.commit()
+        return jsonify({"message": "Pet added successfully", "pet": data}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/protected', methods=['GET'])
 @jwt_required()
