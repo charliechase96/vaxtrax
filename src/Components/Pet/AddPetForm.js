@@ -41,54 +41,57 @@ function AddPetForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>Pet Image URL</label>
-            <input 
-                value={petImgUrl}
-                onChange={(e) => setPetImgUrl(e.target.value)}
-                type="url" 
-                placeholder="Pet URL" 
-            />
-            <label>Pet Name</label>
-            <input 
-                value={petName}
-                onChange={(e) => setPetName(e.target.value)}
-                type="text" 
-                placeholder="Pet name" 
-                required 
-            />
-            <label>Type</label>
-            <select 
-                defaultValue={type} 
-                onChange={(e) => setType(e.target.value)}
-                required
-            >
-                <option
-                    disabled
+        <div className="add-pet-form">
+            <h2>Add a Pet</h2>
+            <form onSubmit={handleSubmit}>
+                <label>Pet Image URL</label>
+                <input 
+                    value={petImgUrl}
+                    onChange={(e) => setPetImgUrl(e.target.value)}
+                    type="url" 
+                    placeholder="Pet URL" 
+                />
+                <label>Pet Name</label>
+                <input 
+                    value={petName}
+                    onChange={(e) => setPetName(e.target.value)}
+                    type="text" 
+                    placeholder="Pet name" 
+                    required 
+                />
+                <label>Type</label>
+                <select 
+                    defaultValue={type} 
+                    onChange={(e) => setType(e.target.value)}
+                    required
                 >
-                    Type
-                </option>
-                <option value="Cat">Cat</option>
-                <option value="Dog">Dog</option>
-            </select>
-            <label>Breed</label>
-            <input 
-                value={breed}
-                onChange={(e) => setBreed(e.target.value)}
-                type="text" 
-                placeholder="Pet breed" 
-                required
-            />
-            <label>Pet Birthday</label>
-            <input 
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                type="date" 
-                placeholder="MM/DD/YYYY" 
-                required 
-            />
-            <button type="submit">Add Pet</button>
-        </form>
+                    <option
+                        disabled
+                    >
+                        Type
+                    </option>
+                    <option value="Cat">Cat</option>
+                    <option value="Dog">Dog</option>
+                </select>
+                <label>Breed</label>
+                <input 
+                    value={breed}
+                    onChange={(e) => setBreed(e.target.value)}
+                    type="text" 
+                    placeholder="Pet breed" 
+                    required
+                />
+                <label>Pet Birthday</label>
+                <input 
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
+                    type="date" 
+                    placeholder="MM/DD/YYYY" 
+                    required 
+                />
+                <button type="submit">Add Pet</button>
+            </form>
+        </div>
     )
 }
 

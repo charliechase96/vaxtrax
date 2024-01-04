@@ -10,6 +10,7 @@ function LogoutButton() {
 
     return (
         <button
+            className="logout"
             onClick={Logout}
         >
             Logout

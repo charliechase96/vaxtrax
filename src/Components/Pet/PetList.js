@@ -17,7 +17,7 @@ function PetList() {
     }, []);
 
     return (
-        <div>
+        <div className="pet-list">
             <h2>Your Pets</h2>
             {pets.map(pet => ( <PetCard pet={pet} />))}
         </div>

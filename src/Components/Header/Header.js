@@ -4,7 +4,7 @@ import LogoutButton from "./LogoutButton";
 
 function Header() {
     return (
-        <div>
+        <div className="header">
             <Logo />
             <LogoutButton />
         </div>
