@@ -37,8 +37,8 @@ function Login({onLoginSuccess}) {
     };
 
     return (
-        <>
-            <div>
+        <div className='login-container'>
+            <div className='login-form'>
                 <h1>Welcome to VaxTrax!</h1>
                 <form onSubmit={handleLogin}>
                     <h3>Login with Email and Password</h3>
@@ -75,7 +75,7 @@ function Login({onLoginSuccess}) {
                 {error && <div>{error}</div>}
             </div>
             <Footer />
-        </>
+        </div>
     )
 }
 

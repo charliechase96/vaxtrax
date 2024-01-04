@@ -38,11 +38,11 @@ function Signup({onSignupSuccess}) {
     };
 
     return (
-        <>
-            <div>
+        <div className='signup-container'>
+            <div className='signup-form'>
                 <h1>Welcome to VaxTrax!</h1>
                 <form onSubmit={handleSignup}>
-                    <h3>Login with Email and Password</h3>
+                    <h3>Sign Up with Email and Password</h3>
                     <label>Username</label>
                     <input 
                         type="email" 
@@ -76,7 +76,7 @@ function Signup({onSignupSuccess}) {
                 {error && <div>{error}</div>}
             </div>
             <Footer />
-        </>
+        </div>
     )
 }
 
