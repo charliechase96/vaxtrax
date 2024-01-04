@@ -63,8 +63,15 @@ function AddPetForm() {
                 onChange={(e) => setType(e.target.value)}
                 required
             >
-                <option>Cat</option>
-                <option>Dog</option>
+                <option 
+                    value={type} 
+                    disabled
+                    selected
+                >
+                    Type
+                </option>
+                <option value="Cat">Cat</option>
+                <option value="Dog">Dog</option>
             </select>
             <label>Breed</label>
             <input 

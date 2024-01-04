@@ -63,6 +63,20 @@ def add_pet():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/pets', methods=['GET'])
+def get_pets():
+    pets = Pet.query.all()
+    pet_list = [{
+        'id': pet.id,
+        'img_url': pet.img_url,
+        'name': pet.name,
+        'type': pet.type,
+        'breed': pet.breed,
+        'birthday': pet.birthday.strftime("%Y-%m-%d")
+    } for pet in pets]
+
+    return jsonify(pet_list)
+
 @app.route('/api/protected', methods=['GET'])
 @jwt_required()
 def protected():
