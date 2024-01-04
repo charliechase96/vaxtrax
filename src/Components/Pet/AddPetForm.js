@@ -59,14 +59,12 @@ function AddPetForm() {
             />
             <label>Type</label>
             <select 
-                value={type} 
+                defaultValue={type} 
                 onChange={(e) => setType(e.target.value)}
                 required
             >
-                <option 
-                    value={type} 
+                <option
                     disabled
-                    selected
                 >
                     Type
                 </option>
