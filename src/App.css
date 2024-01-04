@@ -198,7 +198,7 @@ body {
 
 @media screen and (max-width: 600px) {
   .login-form h1 {
-      font-size: 1.5em; /* Smaller font size for very small screens */
+      font-size: 2em; /* Smaller font size for very small screens */
   }
 
   .login-form {
@@ -206,7 +206,7 @@ body {
   }
 
   .signup-form h1 {
-    font-size: 1.5em;
+    font-size: 2em;
   }
 
   .signup-form {
