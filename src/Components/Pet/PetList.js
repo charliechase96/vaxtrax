@@ -16,10 +16,14 @@ function PetList() {
             .catch(error => console.error("Fetch error", error));
     }, []);
 
+    const handleDeletePet = (petId) => {
+        setPets(pets.filter(pet => pet.id !== petId));
+    };
+
     return (
         <div className="pet-list">
             <h2>Your Pets</h2>
-            {pets.map(pet => ( <PetCard pet={pet} />))}
+            {pets.map(pet => ( <PetCard key={pet.id} pet={pet} onDelete={handleDeletePet} />))}
         </div>
     )
 }

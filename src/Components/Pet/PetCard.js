@@ -1,7 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import DeletePetButton from "./DeletePetButton";
+import PetProfileButton from "./PetProfileButton";
 
-function PetCard({pet}) {
+function PetCard({ pet, onDelete }) {
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
 
     const dogProfilePic = "https://cdn-icons-png.flaticon.com/512/194/194279.png"
@@ -13,6 +15,24 @@ function PetCard({pet}) {
     function handleNavigate() {
         navigate("/home/pet-profile");
     }
+
+    function handleDelete() {
+        fetch(`http://localhost:5000/api/delete_pet/${pet.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                onDelete(pet.id);
+            } else {
+                throw new Error('Failed to delete pet.');
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    };
     
     return (
         <div className="pet-card" key={pet.id}>
@@ -22,8 +42,8 @@ function PetCard({pet}) {
             <p>Breed: {pet.breed}</p>
             <p>Birthday: {pet.birthday}</p>
             <div className="pet-card-buttons">
-                <button onClick={handleNavigate}>Pet Profile</button>
-                <button>Delete Pet</button>
+                <PetProfileButton onNavigate={handleNavigate}/>
+                <DeletePetButton onDeletePet={handleDelete} />
             </div>
         </div>
     )

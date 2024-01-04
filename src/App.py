@@ -86,6 +86,20 @@ def get_pets():
 
     return jsonify(pet_list)
 
+@app.route('/api/delete_pet/<int:pet_id>', methods=['DELETE'])
+def delete_pet(pet_id):
+    try:
+        pet = Pet.query.get(pet_id)
+        if pet is None:
+            return jsonify({"message": "Pet not found"}), 404
+
+        db.session.delete(pet)
+        db.session.commit()
+        return jsonify({"message": "Pet deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/api/protected', methods=['GET'])
 @jwt_required()
 def protected():
