@@ -180,6 +180,40 @@ body {
   padding: 2.5%;
 }
 
+.login-form h1 {
+    font-size: 2em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.signup-form h1 {
+    font-size: 2em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+  .login-form h1 {
+      font-size: 1.5em; /* Smaller font size for very small screens */
+  }
+
+  .login-form {
+      width: 90%; /* Increase width on smaller screens if needed */
+  }
+
+  .signup-form h1 {
+    font-size: 1.5em;
+  }
+
+  .signup-form {
+    width: 90%;
+  }
+}
+
 .login-form form {
   width: 100%;
   display: flex;
