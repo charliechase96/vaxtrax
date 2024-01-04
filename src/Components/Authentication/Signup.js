@@ -42,7 +42,7 @@ function Signup({onSignupSuccess}) {
             <div className='signup-form'>
                 <h1>Welcome to VaxTrax!</h1>
                 <form onSubmit={handleSignup}>
-                    <h3>Sign Up with Email and Password</h3>
+                    <h3>Signup with Email and Password</h3>
                     <label>Username</label>
                     <input 
                         type="email" 

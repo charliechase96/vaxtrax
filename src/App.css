@@ -202,7 +202,7 @@ body {
   }
 
   .login-form {
-      width: 90%; /* Increase width on smaller screens if needed */
+    width: 90%; /* Increase width on smaller screens if needed */
   }
 
   .signup-form h1 {
