@@ -177,7 +177,7 @@ body {
   width: 75%;
   margin: auto;
   border-radius: 15px;
-  padding: 2.5%;
+  padding: 25px;
 }
 
 .login-form h1 {
@@ -257,7 +257,7 @@ body {
   width: 75%;
   margin: auto;
   border-radius: 15px;
-  padding: 2.5%;
+  padding: 25px;
 }
 
 .signup-form form {
