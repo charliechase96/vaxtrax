@@ -5,6 +5,7 @@ from models.user import User, db
 from models.pet import Pet
 from config import Config
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -48,19 +49,27 @@ def signup():
 @app.route('/api/add_pet', methods=['POST'])
 def add_pet():
     data = request.get_json()
-    new_pet = Pet(
-        img_url=data['img_url'],
-        name=data['name'],
-        type=data['type'],
-        breed=data['breed'],
-        birthday=data['birthday']
-    )
-    db.session.add(new_pet)
+
     try:
+        birthday_date = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
+
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+    
+    try:
+        new_pet = Pet(
+            img_url=data['img_url'],
+            name=data['name'],
+            type=data['type'],
+            breed=data['breed'],
+            birthday=birthday_date
+        )
+        db.session.add(new_pet)
         db.session.commit()
         return jsonify({"message": "Pet added successfully", "pet": data}), 201
+    
     except Exception as e:
-        db.session.rollback()
+        print("Error adding pet:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/pets', methods=['GET'])

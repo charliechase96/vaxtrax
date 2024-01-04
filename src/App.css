@@ -46,11 +46,43 @@ body {
 .pet-list {
   background-color: rgba(255, 255, 255, 0.5);
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  text-align: center;
   width: 95%;
   margin: auto;
   border-radius: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.pet-list h2 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.pet-list .pet-card {
+  background-color: rgba(255, 255, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 450px;
+  width: 300px;
+  margin: 20px;
+  border-radius: 15px;
+  padding: 10px;
+  
+}
+
+@media screen and (max-width: 600px) {
+  .pet-list .pet-card {
+      flex-basis: 100%; /* Full width on smaller screens */
+  }
 }
 
 .add-pet-form {
@@ -97,4 +129,33 @@ body {
   background-color: rgba(49, 198, 199, 0.5);
   border-radius: 10px;
   width: 25%;
+}
+
+.pet-card img {
+  height: 150px;
+  width: 150px;
+  border-radius: 15px;
+}
+
+.pet-card h3 {
+  text-decoration: underline;
+}
+
+.pet-card-buttons button {
+  padding: 7px 15px;
+  cursor: pointer;
+  background-color: rgba(49, 198, 199, 0.5);
+  border-radius: 10px;
+  width: 100px;
+  margin: 10px;
+}
+
+.pet-card-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }

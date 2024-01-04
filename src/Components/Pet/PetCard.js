@@ -21,8 +21,10 @@ function PetCard({pet}) {
             <p>Type: {pet.type}</p>
             <p>Breed: {pet.breed}</p>
             <p>Birthday: {pet.birthday}</p>
-            <button onClick={handleNavigate}>Pet Profile</button>
-            <button>Delete Pet</button>
+            <div className="pet-card-buttons">
+                <button onClick={handleNavigate}>Pet Profile</button>
+                <button>Delete Pet</button>
+            </div>
         </div>
     )
 }

@@ -7,6 +7,8 @@ function AddPetForm() {
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
 
+    const authToken = localStorage.getItem('authToken');
+
     function handleSubmit(e) {
         e.preventDefault()
 
@@ -22,7 +24,7 @@ function AddPetForm() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Authorization': `Bearer ${localStorage.getItem(authToken)}`,
             },
             body: JSON.stringify(petData),
         })
@@ -34,6 +36,11 @@ function AddPetForm() {
         })
         .then(data => {
             console.log("Pet added:", data);
+            setPetImgUrl("");
+            setPetName("");
+            setType("Type");
+            setBreed("");
+            setBirthday("");
         })
         .catch(error => {
             console.error("Error adding pet:", error);
@@ -86,7 +93,7 @@ function AddPetForm() {
                     value={birthday}
                     onChange={(e) => setBirthday(e.target.value)}
                     type="date" 
-                    placeholder="MM/DD/YYYY" 
+                    placeholder="YYYY/MM/DD" 
                     required 
                 />
                 <button type="submit">Add Pet</button>

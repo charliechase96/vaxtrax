@@ -2,7 +2,7 @@ import React from "react";
 
 function Logo() {
     return (
-        <img className="logo" alt="VaxTrax Logo" src="https://lh3.googleusercontent.com/pw/ABLVV87kIAN6VZUd-O6OvNTMxTuPdTYW_OytPDMYMQHxBOmyLRcRC9A7UL-3Mo7mE4Eb7l6s4SZhvnuuZsW5677rAfnMAB-5u1NCB-fl-XZa021HPiOOPxlsvQGhI7bzuAFsRvSQWG2MbgdfKi9q47UKtpHBzdAE63CEUoZbaP90_0nDfckRNnQ0ydWESNwgYp9KKbVRJS54scTHWdNZ8LkK1I5_G9EtPg0mJGR1tSaRO35U1-wcALEfoMt5zs3xBaUD6bt5IOh2riTz7yneaAnADiGvBfpvIUB8ZFDhw1ZhBja-_q9tYx9TJZREiHQ_i_KkOgtbg6rEzbdKJkI2QyNJKKtUs4RySzkW3arnve01Ac-2T0jZnDr0DkcvUrY5SGmVJB0DgRLICRLiE-gTAR3aZ-YBXBoK5FaUu7J-iVUEwoh7OSjtB40AtMFbmuYC8auK1Goy7ZtTpDXZoMhk8tCMJltmn3GfqR7pu4fglaCVzDwuSu7myiytlEeKI6dj_3aIRufD3gjhg0_svjgY565bzbtATgrJMFNy0PoTxknACZbidZWc-d8JblAgcPwbFwepYFSHrZc-riFb7a8p0bh25RV76Dh2utcwa1_f9R7Zp4WOOBkE7mg4NCVewJHLrHDpF2gHnAUp8YKuRTJDfScRd24sqQFtmEu9wvt1GZY58GLb6tzkALqTrkSyFnDj0LnzMFyFzCt73in9ynTQzZG1BcY5zTY7zpWEmiF5iL1zERVIHjQVEaFgImOjQ_v90oYIEfuzE_n2Ca1aC55DoT2HWkTiLI2w8NA2yICYoBkTZd4VRgNZ5aPaixtuGHuP9DEcSQhCbQaFg91B5_yuZCwdxcmxErnnmjSnflWg6Wyd6WlKKn_AWSnk9kuPNOn1N0maqFUMoA=w710-h345-s-no-gm?authuser=0"/>
+        <img className="logo" alt="VaxTrax Logo" src="https://i.imgur.com/CEWJ8ER.png"/>
     )
 }
 
