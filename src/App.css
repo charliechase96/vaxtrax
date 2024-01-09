@@ -174,7 +174,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 75%;
+  width: 50%;
   margin: auto;
   border-radius: 15px;
   padding: 25px;
@@ -202,7 +202,7 @@ body {
   }
 
   .login-form {
-    width: 90%; /* Increase width on smaller screens if needed */
+    width: 75%; /* Increase width on smaller screens if needed */
   }
 
   .signup-form h1 {
@@ -210,7 +210,7 @@ body {
   }
 
   .signup-form {
-    width: 90%;
+    width: 75%;
   }
 }
 
@@ -254,7 +254,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 75%;
+  width: 50%;
   margin: auto;
   border-radius: 15px;
   padding: 25px;
