@@ -1,8 +1,8 @@
 import React from "react";
 
-function DeleteVaccineButton() {
+function DeleteVaccineButton({ onDelete, vaccineId }) {
     return (
-        <button className="x">❌</button>
+        <button className="x" onClick={() => onDelete(vaccineId)}>❌</button>
     )
 }
 
