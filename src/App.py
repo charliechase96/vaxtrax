@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models.user import User, db
 from models.pet import Pet
+from models.vaccine import Vaccine
 from config import Config
 from flask_cors import CORS
 from datetime import datetime
@@ -87,6 +88,17 @@ def get_pets():
     } for pet in pets]
 
     return jsonify(pet_list)
+
+@app.route('api/vaccines', methods=['GET'])
+def get_vaccines():
+    vaccines = Vaccine.query.all()
+    vaccine_list = [{
+        'id': vaccine.id,
+        'name': vaccine.name,
+        'due_date': vaccine.vaccine_due_date.strftime("%Y-%m-%d")
+    } for vaccine in vaccines]
+
+    return jsonify(vaccine_list)
 
 @app.route('/api/delete_pet/<int:pet_id>', methods=['DELETE'])
 def delete_pet(pet_id):

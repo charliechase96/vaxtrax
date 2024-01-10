@@ -285,3 +285,105 @@ body {
   border-radius: 10px;
   width: 25%;
 }
+
+.pet-profile-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.pet-details {
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 450px;
+  width: 300px;
+  margin: 10px;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.pet-details h3 {
+  text-decoration: underline;
+}
+
+.pet-details img {
+  height: 150px;
+  width: 150px;
+  border-radius: 15px;
+}
+
+.vaccine-form {
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  width: 300px;
+  margin: 10px;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.vaccine-form h3 {
+  margin-bottom: 25px;
+}
+
+.vaccine-form .vaccines {
+  width: 50%;
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 2px 2px;
+  border-radius: 7px;
+}
+
+.vaccine-duration {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.vaccine-duration input {
+  width: 25%;
+  height: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 7px;
+}
+
+.vaccine-duration select {
+  width: 25%;
+  height: 27px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 7px;
+  text-align: center;
+}
+
+.details-and-vaccine-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.add-vaccine {
+  padding: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+  background-color: rgba(49, 198, 199, 0.5);
+  border-radius: 10px;
+  width: 35%;
+}
+
+.vaccines-and-alerts {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

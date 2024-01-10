@@ -13,7 +13,7 @@ function PetCard({ pet, onDelete }) {
     const navigate = useNavigate();
 
     function handleNavigate() {
-        navigate("/home/pet-profile");
+        navigate("/home/pet-profile", { state: { pet } });
     }
 
     function handleDelete() {
