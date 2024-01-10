@@ -17,8 +17,7 @@ function Signup({onSignupSuccess}) {
         fetch('https://vaxtrax.pet/api/signup', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, password }),
         })
