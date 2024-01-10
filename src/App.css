@@ -403,6 +403,7 @@ body {
   margin: 10px;
   border-radius: 15px;
   padding: 5px;
+  overflow-y: auto;
 }
 
 .vaccine {
@@ -415,7 +416,9 @@ body {
   padding: 5px 10px 5px 10px;
   border-radius: 5px;
   width: 95%;
+  height: 10%;
   margin-bottom: 20px;
+  font-size: 0.9em;
 }
 
 .alert-form select {
@@ -425,10 +428,21 @@ body {
   border-radius: 5px;
 }
 
+.alert-form p {
+  font-size: 0.75em;
+}
+
 .alert-form button {
-  margin-left: 5px;
+  margin-left: 15px;
   padding: 5px;
   border-radius: 5px;
+}
+
+.alert-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .alerts-list {

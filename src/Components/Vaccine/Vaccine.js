@@ -7,6 +7,7 @@ function Vaccine({ vaccine, onDelete }) {
         <div className="vaccine">
             <p>{vaccine.name}</p>
             <p>{vaccine.due_date}</p>
+            <p>Days until due:</p>
             <AlertForm />
             <DeleteVaccineButton onDelete={onDelete} vaccineId={vaccine.id}/>
         </div>
