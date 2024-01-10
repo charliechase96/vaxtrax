@@ -44,7 +44,7 @@ function PetProfile() {
         })
         .then(data => {
             console.log("Vaccine added:", data);;
-            setVaccineName("");
+            setVaccineName("Vaccine");
             setDueDate("");
         })
         .catch(error => {
@@ -65,7 +65,21 @@ function PetProfile() {
                         <p>Birthday: {pet.birthday}</p>
                     </div>
                     <div className="vaccine-form">
-                        {pet.type === "Cat" ? <CatVaccineForm onAddVaccine={handleSubmit}/> : <DogVaccineForm onAddVaccine={handleSubmit}/>}
+                        {pet.type === "Cat" ? 
+                            <CatVaccineForm 
+                                dueDate={dueDate}
+                                vaccineName={vaccineName}
+                                onAddVaccine={handleSubmit}
+                                setVaccineName={setVaccineName}
+                                setDueDate={setDueDate}
+                            /> : 
+                            <DogVaccineForm
+                                dueDate={dueDate}
+                                vaccineName={vaccineName} 
+                                onAddVaccine={handleSubmit}
+                                setVaccineName={setVaccineName}
+                                setDueDate={setDueDate}
+                            />}
                     </div>
                 </div>
                 <div className="vaccines-and-alerts">
