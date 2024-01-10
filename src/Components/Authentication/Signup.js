@@ -10,11 +10,10 @@ function Signup({onSignupSuccess}) {
     const [error, setError] = useState('');
 
     const navigate = useNavigate();
-    const authToken = localStorage.getItem('authToken');
 
     function handleSignup(event) {
         event.preventDefault();
-        fetch('https://vaxtrax.pet/api/signup', {
+        fetch('http://localhost:5000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

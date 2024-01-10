@@ -9,11 +9,10 @@ function Login({onLoginSuccess}) {
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
-    const authToken = localStorage.getItem('authToken');
 
     function handleLogin(event) {
         event.preventDefault();
-        fetch('https://vaxtrax.pet/api/login', {
+        fetch('http://localhost:5000/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
