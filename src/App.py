@@ -89,7 +89,30 @@ def get_pets():
 
     return jsonify(pet_list)
 
-@app.route('api/vaccines', methods=['GET'])
+@app.route('/api/add_vaccine', methods=['POST'])
+def add_vaccine():
+    data = request.get_json()
+
+    try:
+        vaccine_due_date = datetime.strptime(data['due_date'], '%Y-%m-%d').date()
+
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+    
+    try:
+        new_vaccine = Vaccine(
+            name=data['name'],
+            due_date=vaccine_due_date
+        )
+        db.session.add(new_vaccine)
+        db.session.commit()
+        return jsonify({"message": "Vaccine added successfully", "vaccine": data}), 201
+    
+    except Exception as e:
+        print("Error adding vaccine:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/vaccines', methods=['GET'])
 def get_vaccines():
     vaccines = Vaccine.query.all()
     vaccine_list = [{

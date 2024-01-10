@@ -341,6 +341,17 @@ body {
   border-radius: 7px;
 }
 
+.vaccine-form form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.vaccine-form button {
+  width: 50%;
+}
+
 .vaccine-duration {
   display: flex;
   flex-direction: row;
@@ -349,16 +360,8 @@ body {
 }
 
 .vaccine-duration input {
-  width: 25%;
-  height: 20px;
-  margin-left: 10px;
-  margin-right: 10px;
-  border-radius: 7px;
-}
-
-.vaccine-duration select {
-  width: 25%;
-  height: 27px;
+  width: 50%;
+  height: 25px;
   margin-left: 10px;
   margin-right: 10px;
   border-radius: 7px;
@@ -386,4 +389,32 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.vaccine-list {
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 600px;
+  height: 450px;
+  margin: auto;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.alerts-list {
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 600px;
+  height: 300px;
+  padding: 5px;
+  margin: auto;
+  border-radius: 15px;
 }
