@@ -56,6 +56,11 @@ function CatVaccineForm({ onAddVaccine, setVaccineName, setDueDate, vaccineName,
                     >
                         Feline infectious peritonitis (FIP)
                     </option>
+                    <option
+                        value="Feline respiratory vaccine"
+                    >
+                        Feline respiratory vaccine
+                    </option>
                 </select>
                 <div className="vaccine-duration">
                     <p>Due on: </p>

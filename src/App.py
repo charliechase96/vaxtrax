@@ -118,7 +118,7 @@ def get_vaccines():
     vaccine_list = [{
         'id': vaccine.id,
         'name': vaccine.name,
-        'due_date': vaccine.vaccine_due_date.strftime("%Y-%m-%d")
+        'due_date': vaccine.due_date.strftime("%Y-%m-%d")
     } for vaccine in vaccines]
 
     return jsonify(vaccine_list)
@@ -133,6 +133,19 @@ def delete_pet(pet_id):
         db.session.delete(pet)
         db.session.commit()
         return jsonify({"message": "Pet deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/delete_vaccine/<int:vaccine_id>', methods=['DELETE'])
+def delete_vaccine(vaccine_id):
+    try:
+        vaccine = Vaccine.query.get(vaccine_id)
+        if vaccine is None:
+            return jsonify({"message": "Vaccine not found"}), 404
+
+        db.session.delete(vaccine)
+        db.session.commit()
+        return jsonify({"message": "Vaccine deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

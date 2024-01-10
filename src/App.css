@@ -398,11 +398,37 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 600px;
+  width: 750px;
   height: 450px;
-  margin: auto;
+  margin: 10px;
   border-radius: 15px;
   padding: 5px;
+}
+
+.vaccine {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px;
+  width: 95%;
+  margin-bottom: 20px;
+}
+
+.alert-form select {
+  text-align: center;
+  margin-right: 5px;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.alert-form button {
+  margin-left: 5px;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 .alerts-list {
@@ -412,9 +438,9 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 600px;
+  width: 750px;
   height: 300px;
   padding: 5px;
-  margin: auto;
+  margin: 10px;
   border-radius: 15px;
 }

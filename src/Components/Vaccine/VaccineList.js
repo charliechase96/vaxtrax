@@ -1,24 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Vaccine from "./Vaccine";
 
-function VaccineList() {
-    const [vaccines, setVaccines] = useState([]);
+function VaccineList({ pet, vaccines, setVaccines }) {
 
-    useEffect(() => {
-        fetch('http://localhost:5000/api/vaccines')
-            .then(response => {
-                if(response.ok) {
-                    return response.json();
-                }
-                throw new Error('Network response was not okay.');
+    function handleDeleteVaccine(vaccineId) {
+        fetch(`http://localhost:5000/api/delete_vaccine/${vaccineId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
             })
-            .then(data => setVaccines(data))
-            .catch(error => console.error("Fetch error", error));
-    }, []);
+            .then(response => {
+                if (response.ok) {
+                    setVaccines(prevVaccines => prevVaccines.filter(vaccine => vaccine.id !== vaccineId))
+                }
+                else {
+                    throw new Error('Failed to delete the vaccine.');
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        };
 
     return (
         <>
-            {vaccines.map((vaccine) => ( <Vaccine key={vaccine.id} vaccine={vaccine} />))}
+            <h3>{pet.name}'s Vaccines</h3>
+            {vaccines.map((vaccine) => ( <Vaccine pet={pet} key={vaccine.id} vaccine={vaccine} onDelete={handleDeleteVaccine}/>))}
         </>
         
     )

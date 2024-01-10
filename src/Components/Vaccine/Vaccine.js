@@ -1,19 +1,14 @@
 import React from "react";
+import DeleteVaccineButton from "./DeleteVaccineButton";
+import AlertForm from "../Alerts/AlertForm";
 
-function Vaccine({ vaccine }) {
+function Vaccine({ vaccine, onDelete }) {
     return (
-        <div>
+        <div className="vaccine">
             <p>{vaccine.name}</p>
             <p>{vaccine.due_date}</p>
-            <select>
-                <option>Set alert for...</option>
-                <option>60 days before</option>
-                <option>30 days before</option>
-                <option>7 days before</option>
-                <option>On due date</option>
-            </select>
-            <button>Set Alert</button>
-            <button>❌</button>
+            <AlertForm />
+            <DeleteVaccineButton onDelete={onDelete} vaccineId={vaccine.id}/>
         </div>
     )
 }

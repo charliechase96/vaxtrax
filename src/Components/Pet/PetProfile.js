@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import CatVaccineForm from "../Vaccine/CatVaccineForm";
 import DogVaccineForm from "../Vaccine/DogVaccineForm";
+import VaccineList from "../Vaccine/VaccineList";
+import AlertList from "../Alerts/AlertList";
 
 function PetProfile() {
     const [vaccineName, setVaccineName] = useState("Vaccine");
     const [dueDate, setDueDate] = useState("");
+    const [vaccines, setVaccines] = useState([]);
 
     const location = useLocation();
     const pet = location.state?.pet;
@@ -52,6 +55,22 @@ function PetProfile() {
         });
     }
 
+    function fetchVaccines() {
+        fetch('http://localhost:5000/api/vaccines')
+                .then(response => {
+                    if(response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not okay.');
+                })
+                .then(data => setVaccines(data))
+                .catch(error => console.error("Fetch error", error));
+            }
+    
+    useEffect(() => {
+        fetchVaccines();
+    }, []);      
+
     return (
         <>
             <Header />
@@ -84,8 +103,14 @@ function PetProfile() {
                 </div>
                 <div className="vaccines-and-alerts">
                     <div className="vaccine-list">
+                        <VaccineList 
+                            pet={pet} 
+                            vaccines={vaccines}
+                            setVaccines={setVaccines}
+                        />
                     </div>
                     <div className="alerts-list">
+                        <AlertList />
                     </div>
                 </div>
             </div>
