@@ -220,8 +220,8 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 with app.app_context():
-    db.drop_all()
-    db.create_all() # This line creates all SQL tables based on the models
+    # db.drop_all()
+    # db.create_all() # This line creates all SQL tables based on the models
 
 if __name__ == '__main__':
     app.run(debug=True)
