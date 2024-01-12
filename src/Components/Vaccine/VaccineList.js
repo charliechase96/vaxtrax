@@ -1,7 +1,7 @@
 import React from "react";
 import Vaccine from "./Vaccine";
 
-function VaccineList({ pet, vaccines, setVaccines }) {
+function VaccineList({ pet, vaccines, setVaccines, onCreateAlert }) {
 
     function handleDeleteVaccine(vaccineId) {
         fetch(`http://localhost:5000/api/delete_vaccine/${vaccineId}`, {
@@ -25,7 +25,15 @@ function VaccineList({ pet, vaccines, setVaccines }) {
     return (
         <>
             <h3>{pet.name}'s Vaccines</h3>
-            {vaccines.map((vaccine) => ( <Vaccine pet={pet} key={vaccine.id} vaccine={vaccine} onDelete={handleDeleteVaccine}/>))}
+            {vaccines.map((vaccine) => ( 
+                <Vaccine 
+                    pet={pet} 
+                    key={vaccine.id} 
+                    vaccine={vaccine} 
+                    onDelete={handleDeleteVaccine}
+                    onCreateAlert={onCreateAlert}
+                    />
+            ))}
         </>
         
     )

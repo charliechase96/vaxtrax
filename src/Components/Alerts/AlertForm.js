@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 
-function AlertForm() {
+function AlertForm({ vaccine, onCreateAlert }) {
     const [alertDay, setAlertDay] = useState("##");
 
-    function handleSubmit() {
-        
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        if (alertDay !== "##") {
+            onCreateAlert(vaccine.id, alertDay);
+        }
     }
 
     return (
         <div className="alert-form">
             <form onSubmit={handleSubmit}>
+                <p className="alert-me">Alert me:</p>
                 <select 
                     value={alertDay}
                     onChange={(e) => setAlertDay(e.target.value)}
@@ -25,6 +30,7 @@ function AlertForm() {
                     <option value="7">7</option>
                     <option value="0">0</option>
                 </select>
+                <p>days before due</p>
                 <button>Set Alert</button>
             </form>
         </div>

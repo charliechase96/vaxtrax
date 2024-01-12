@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from models.user import User, db
 from models.pet import Pet
 from models.vaccine import Vaccine
+from models.alert import Alert
 from config import Config
 from flask_cors import CORS
 from datetime import datetime
@@ -146,6 +147,63 @@ def delete_vaccine(vaccine_id):
         db.session.delete(vaccine)
         db.session.commit()
         return jsonify({"message": "Vaccine deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Add an alert
+@app.route('/api/add_alert', methods=['POST'])
+def add_alert():
+    data = request.get_json()
+
+    try:
+        # Extract the vaccine name and due date from the nested dictionary
+        vaccine_info = data['vaccine_name']
+        vaccine_name = vaccine_info['name']
+        vaccine_due_date = vaccine_info['due_date']
+
+        # Convert the string date for the alert to a Python date object
+        alert_date = datetime.strptime(data['alert_date'], '%Y-%m-%d').date()
+
+        # Optionally, you can also convert the vaccine_due_date, if needed for your logic
+        # vaccine_due_date_obj = datetime.strptime(vaccine_due_date, '%Y-%m-%d').date()
+
+        new_alert = Alert(
+            vaccine_name=vaccine_name, 
+            alert_date=alert_date, 
+            vaccine_id=data['vaccine_id']
+        )
+        db.session.add(new_alert)
+        db.session.commit()
+        return jsonify({"message": "Alert added successfully"}), 201
+    except KeyError:
+        return jsonify({"error": "Invalid data format"}), 400
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Get all alerts
+@app.route('/api/alerts', methods=['GET'])
+def get_alerts():
+    alerts = Alert.query.all()
+    alert_list = [{
+        'id': alert.id,
+        'vaccine_name': alert.vaccine_name,
+        'alert_date': alert.alert_date.strftime("%Y-%m-%d"),
+        'vaccine_id': alert.vaccine_id
+    } for alert in alerts]
+    return jsonify(alert_list)
+
+# Delete an alert
+@app.route('/api/delete_alert/<int:alert_id>', methods=['DELETE'])
+def delete_alert(alert_id):
+    try:
+        alert = Alert.query.get(alert_id)
+        if alert is None:
+            return jsonify({"message": "Alert not found"}), 404
+        db.session.delete(alert)
+        db.session.commit()
+        return jsonify({"message": "Alert deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

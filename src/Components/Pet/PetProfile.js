@@ -11,6 +11,7 @@ function PetProfile() {
     const [vaccineName, setVaccineName] = useState("Vaccine");
     const [dueDate, setDueDate] = useState("");
     const [vaccines, setVaccines] = useState([]);
+    const [alerts, setAlerts] = useState([]);
 
     const location = useLocation();
     const pet = location.state?.pet;
@@ -71,6 +72,61 @@ function PetProfile() {
         fetchVaccines();
     }, []);      
 
+    function fetchAlerts() {
+        fetch('http://localhost:5000/api/alerts')
+            .then(response => response.json())
+            .then(data => setAlerts(data))
+            .catch(error => console.error("Fetch error", error));
+    }
+
+    useEffect(() => {
+        fetchAlerts();
+    }, []);
+
+    function calculateAlertDate(alertDay, vaccineDueDate) {
+        // Convert the vaccineDueDate from a string to a Date object
+        const dueDate = new Date(vaccineDueDate);
+    
+        // Subtract the alertDays from the dueDate
+        dueDate.setDate(dueDate.getDate() - alertDay);
+    
+        // Format the date back to a string in the 'YYYY-MM-DD' format
+        const year = dueDate.getFullYear();
+        const month = String(dueDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(dueDate.getDate()).padStart(2, '0');
+    
+        return `${year}-${month}-${day}`;
+    }
+
+    function createAlert(vaccineId, alertDay) {
+        const vaccine = vaccines.find(v => v.id === vaccineId);
+        if (!vaccine) return;
+
+        const alertDate = calculateAlertDate(alertDay, vaccine.due_date);
+
+        const alertData = {
+            vaccine_name: vaccine,
+            alert_date: alertDate,
+            vaccine_id: vaccineId
+        };
+
+        fetch('http://localhost:5000/api/add_alert', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(alertData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                fetchAlerts(); // Fetch updated alerts
+            }
+        })
+        .catch(error => console.error("Error adding alert:", error));
+    }
+
     return (
         <>
             <Header />
@@ -107,10 +163,15 @@ function PetProfile() {
                             pet={pet} 
                             vaccines={vaccines}
                             setVaccines={setVaccines}
+                            onCreateAlert={createAlert}
                         />
                     </div>
                     <div className="alerts-list">
-                        <AlertList />
+                        <AlertList 
+                            pet={pet}
+                            alerts={alerts}
+                            setAlerts={setAlerts} 
+                        />
                     </div>
                 </div>
             </div>

@@ -423,22 +423,22 @@ body {
 
 .alert-form select {
   text-align: center;
-  margin-right: 5px;
+  margin-right: 10px;
   padding: 5px;
   border-radius: 5px;
 }
 
-.alert-form p {
-  font-size: 0.75em;
+.alert-form .alert-me {
+  margin-right: 10px;
 }
 
 .alert-form button {
-  margin-left: 15px;
+  margin-left: 10px;
   padding: 5px;
   border-radius: 5px;
 }
 
-.alert-form {
+.alert-form form {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -457,4 +457,5 @@ body {
   padding: 5px;
   margin: 10px;
   border-radius: 15px;
+  overflow-y: auto;
 }
