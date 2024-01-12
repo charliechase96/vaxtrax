@@ -1,6 +1,7 @@
 import React from "react";
 
 function DogVaccineForm({ onAddVaccine, setVaccineName, setDueDate, vaccineName, dueDate }) {
+    
     return (
         <>
             <form onSubmit={onAddVaccine}>

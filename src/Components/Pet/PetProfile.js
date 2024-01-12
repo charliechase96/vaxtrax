@@ -64,7 +64,9 @@ function PetProfile() {
                     }
                     throw new Error('Network response was not okay.');
                 })
-                .then(data => setVaccines(data))
+                .then(data => {
+                    console.log(data)
+                    setVaccines(data)})
                 .catch(error => console.error("Fetch error", error));
             }
     
@@ -100,16 +102,22 @@ function PetProfile() {
 
     function createAlert(vaccineId, alertDay) {
         const vaccine = vaccines.find(v => v.id === vaccineId);
-        if (!vaccine) return;
+
+        if (!vaccine) {
+            console.error("Vaccine not found for ID:", vaccineId);
+            return;
+        }
 
         const alertDate = calculateAlertDate(alertDay, vaccine.due_date);
 
         const alertData = {
-            vaccine_name: vaccine,
+            vaccine_name: vaccine.name,
             alert_date: alertDate,
-            due_date: dueDate,
+            due_date: vaccine.due_date,
             vaccine_id: vaccineId
         };
+
+        console.log("Alert data to be sent:", alertData);
 
         fetch('http://localhost:5000/api/add_alert', {
             method: 'POST',
@@ -148,6 +156,7 @@ function PetProfile() {
                                 onAddVaccine={handleSubmit}
                                 setVaccineName={setVaccineName}
                                 setDueDate={setDueDate}
+                                vaccines={vaccines}
                             /> : 
                             <DogVaccineForm
                                 dueDate={dueDate}
@@ -155,6 +164,7 @@ function PetProfile() {
                                 onAddVaccine={handleSubmit}
                                 setVaccineName={setVaccineName}
                                 setDueDate={setDueDate}
+                                vaccines={vaccines}
                             />}
                     </div>
                 </div>

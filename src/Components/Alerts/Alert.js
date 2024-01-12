@@ -6,6 +6,7 @@ function Alert({ alert, onDelete }) {
     return (
         <div className="alert">
             <p>Vaccine: {alert.vaccine_name}</p>
+            <p>Due Date: {alert.due_date}</p>
             <p>Alert Date: {alert.alert_date}</p>
             <DeleteAlertButton onDelete={onDelete} alert={alert}/>
         </div>

@@ -1,6 +1,7 @@
 import React from "react";
 
 function CatVaccineForm({ onAddVaccine, setVaccineName, setDueDate, vaccineName, dueDate }) {
+    
     return (
         <>
             <form onSubmit={onAddVaccine}>

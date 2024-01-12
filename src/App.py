@@ -157,18 +157,14 @@ def delete_vaccine(vaccine_id):
 @app.route('/api/add_alert', methods=['POST'])
 def add_alert():
     data = request.get_json()
+    print("Received data:", data)
 
     try:
         # Extract the vaccine name and due date from the nested dictionary
-        vaccine_info = data['vaccine_name']
-        vaccine_name = vaccine_info['name']
-        vaccine_due_date = datetime.strptime(vaccine_info['due_date'], '%Y-%m-%d').date()
-
-        # Convert the string date for the alert to a Python date object
+        vaccine_name = data.get('vaccine_name', '')
         alert_date = datetime.strptime(data['alert_date'], '%Y-%m-%d').date()
-
-        # Optionally, you can also convert the vaccine_due_date, if needed for your logic
-        # vaccine_due_date_obj = datetime.strptime(vaccine_due_date, '%Y-%m-%d').date()
+        vaccine_due_date = datetime.strptime(data['due_date'], '%Y-%m-%d').date()
+        print("Extracted due_date:", vaccine_due_date)
 
         new_alert = Alert(
             vaccine_name=vaccine_name, 
@@ -178,6 +174,12 @@ def add_alert():
         )
         db.session.add(new_alert)
         db.session.commit()
+
+        added_alert = Alert.query.filter_by(id=new_alert.id).first()
+        if added_alert:
+            print("Newly added alert:", added_alert)
+
+        print("New alert added:", new_alert)
         return jsonify({"message": "Alert added successfully"}), 201
     except KeyError:
         return jsonify({"error": "Invalid data format"}), 400
@@ -195,6 +197,7 @@ def get_alerts():
         'id': alert.id,
         'vaccine_name': alert.vaccine_name,
         'alert_date': alert.alert_date.strftime("%Y-%m-%d"),
+        'due_date': alert.due_date.strftime("%Y-%m-%d"),
         'vaccine_id': alert.vaccine_id
     } for alert in alerts]
     return jsonify(alert_list)
@@ -219,9 +222,8 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-# with app.app_context():
-    # db.drop_all()
-    # db.create_all() # This line creates all SQL tables based on the models
+with app.app_context():
+    db.create_all() # This line creates all SQL tables based on the models
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,7 +1,4 @@
-import os
 
 class Config:
-    SECRET_KEY = os.urandom(24) #generate a random secret key
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///vaxtrax.db'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://charlie_chase_gray:BLONDIE_96@localhost/vaxtrax_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.urandom(24)
