@@ -219,7 +219,7 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-with app.app_context():
+# with app.app_context():
     # db.drop_all()
     # db.create_all() # This line creates all SQL tables based on the models
 
