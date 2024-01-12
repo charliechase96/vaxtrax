@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models.user import User, db
@@ -11,6 +12,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+migrate = Migrate(app, db)
 
 db.init_app(app)
 jwt = JWTManager(app)
@@ -159,7 +162,7 @@ def add_alert():
         # Extract the vaccine name and due date from the nested dictionary
         vaccine_info = data['vaccine_name']
         vaccine_name = vaccine_info['name']
-        vaccine_due_date = vaccine_info['due_date']
+        vaccine_due_date = datetime.strptime(vaccine_info['due_date'], '%Y-%m-%d').date()
 
         # Convert the string date for the alert to a Python date object
         alert_date = datetime.strptime(data['alert_date'], '%Y-%m-%d').date()
@@ -169,7 +172,8 @@ def add_alert():
 
         new_alert = Alert(
             vaccine_name=vaccine_name, 
-            alert_date=alert_date, 
+            alert_date=alert_date,
+            due_date=vaccine_due_date, 
             vaccine_id=data['vaccine_id']
         )
         db.session.add(new_alert)
@@ -180,6 +184,7 @@ def add_alert():
     except ValueError:
         return jsonify({"error": "Invalid date format"}), 400
     except Exception as e:
+        print("Error:", e)
         return jsonify({"error": str(e)}), 500
 
 # Get all alerts
@@ -215,6 +220,7 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 with app.app_context():
+    db.drop_all()
     db.create_all() # This line creates all SQL tables based on the models
 
 if __name__ == '__main__':

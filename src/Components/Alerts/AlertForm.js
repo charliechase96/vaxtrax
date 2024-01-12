@@ -9,6 +9,7 @@ function AlertForm({ vaccine, onCreateAlert }) {
         if (alertDay !== "##") {
             onCreateAlert(vaccine.id, alertDay);
         }
+        setAlertDay("##");
     }
 
     return (

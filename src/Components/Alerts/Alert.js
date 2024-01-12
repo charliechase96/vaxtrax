@@ -2,12 +2,12 @@ import React from "react";
 import DeleteAlertButton from "./DeleteAlertButton";
 
 function Alert({ alert, onDelete }) {
-
+    console.log(alert)
     return (
-        <div>
+        <div className="alert">
             <p>Vaccine: {alert.vaccine_name}</p>
             <p>Alert Date: {alert.alert_date}</p>
-            <DeleteAlertButton onDelete={onDelete} />
+            <DeleteAlertButton onDelete={onDelete} alert={alert}/>
         </div>
     )
 }

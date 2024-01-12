@@ -107,6 +107,7 @@ function PetProfile() {
         const alertData = {
             vaccine_name: vaccine,
             alert_date: alertDate,
+            due_date: dueDate,
             vaccine_id: vaccineId
         };
 
