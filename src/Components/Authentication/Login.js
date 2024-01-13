@@ -20,12 +20,16 @@ function Login({onLoginSuccess}) {
             body: JSON.stringify({ email, password }),
         })
         .then(response => {
+            console.log(response)
             if(response.ok) {
                 return response.json();
             }
             throw new Error('Network response was not okay.');
         })
         .then(data => {
+            localStorage.setItem('authToken', data.access_token);
+            localStorage.setItem('user_id', data.user_id);
+
             onLoginSuccess(data);
             navigate('/home');
         })

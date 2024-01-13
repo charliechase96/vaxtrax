@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function AddPetForm() {
     const [petImgUrl, setPetImgUrl] = useState("");
@@ -6,25 +6,39 @@ function AddPetForm() {
     const [type, setType] = useState("Type");
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
+    const [userId, setUserId] = useState(null);
 
     const authToken = localStorage.getItem('authToken');
 
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('user_id');
+        if (storedUserId) {
+            setUserId(storedUserId);
+        }
+    }, []);
+
     function handleSubmit(e) {
         e.preventDefault()
+
+        if (!userId) {
+            console.error('User ID is not available');
+            return;
+        }
 
         const petData = {
             img_url: petImgUrl,
             name: petName,
             type: type,
             breed: breed,
-            birthday: birthday
+            birthday: birthday,
+            user_id: userId
         };
 
         fetch('http://localhost:5000/api/add_pet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem(authToken)}`,
+                'Authorization': `Bearer ${authToken}`,
             },
             body: JSON.stringify(petData),
         })

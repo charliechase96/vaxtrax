@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import UnprocessableEntity
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models.user import User, db
 from models.pet import Pet
@@ -8,7 +9,9 @@ from models.vaccine import Vaccine
 from models.alert import Alert
 from config import Config
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, date, timedelta
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -27,6 +30,80 @@ CORS(app, resources={
         }
     })
 
+def send_email(to_email, template_id, dynamic_template_data):
+    message = Mail(
+        from_email='alerts@vaxtrax.pet',
+        to_emails=to_email
+    )
+    message.template_id = template_id
+    message.dynamic_template_data = dynamic_template_data
+    try:
+        sg = SendGridAPIClient('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')
+        response = sg.send(message)
+        return response.status_code
+    except Exception as e:
+        print(e.message)
+
+def check_vaccine_alerts():
+    today = date.today()
+    alerts = Alert.query.all()
+
+    for alert in alerts:
+        days_until_due = (alert.due_date - today).days
+
+        if days_until_due == 60:
+            send_sixty_day_alert_email(alert)
+        elif days_until_due == 30:
+            send_thirty_day_alert_email(alert)
+        elif days_until_due == 7:
+            send_seven_day_alert_email(alert)
+        elif days_until_due == 0:
+            send_due_alert_email(alert)
+
+def send_sixty_day_alert_email(alert):
+    pet = Pet.query.get(alert.pet_id)
+    user = User.query.get(pet.user_id)
+
+    send_email(user.email, 'd-90b599178f2643a398d2f03cea421446', {
+        'pet_name': pet.name,
+        'vaccine_name': alert.vaccine_name,
+        'due_date': alert.due_date.strftime('%Y-%m-%d'),
+        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
+    })
+
+def send_thirty_day_alert_email(alert):
+    pet = Pet.query.get(alert.pet_id)
+    user = User.query.get(pet.user_id)
+
+    send_email(user.email, 'd-093c3d47b70f49b4a0413c2a5f55dcb8', {
+        'pet_name': pet.name,
+        'vaccine_name': alert.vaccine_name,
+        'due_date': alert.due_date.strftime('%Y-%m-%d'),
+        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
+    })
+
+def send_seven_day_alert_email(alert):
+    pet = Pet.query.get(alert.pet_id)
+    user = User.query.get(pet.user_id)
+
+    send_email(user.email, 'd-56aaa70ae0ef405183b58bf12df975fb', {
+        'pet_name': pet.name,
+        'vaccine_name': alert.vaccine_name,
+        'due_date': alert.due_date.strftime('%Y-%m-%d'),
+        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
+    })
+
+def send_due_alert_email(alert):
+    pet = Pet.query.get(alert.pet_id)
+    user = User.query.get(pet.user_id)
+
+    send_email(user.email, 'd-82bce353b16143b1bb85cdb58e5842bf', {
+        'pet_name': pet.name,
+        'vaccine_name': alert.vaccine_name,
+        'due_date': alert.due_date.strftime('%Y-%m-%d'),
+        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
+    })
+
 @app.route('/api/login', methods=['POST'])
 def login():
     if not request.is_json:
@@ -39,8 +116,11 @@ def login():
     
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token), 200
+        access_token = create_access_token(identity={"user_id": user.id})
+        return jsonify({
+            "access_token": access_token,
+            "user_id": user.id
+            }), 200
     
     return jsonify({"msg": "Bad email or password"}), 401
 
@@ -56,15 +136,21 @@ def signup():
 @app.route('/api/add_pet', methods=['POST'])
 def add_pet():
     data = request.get_json()
+    print("Received data:", data)
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'message': 'User ID is required'}), 400
 
     try:
         birthday_date = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
 
     except ValueError:
         return jsonify({"error": "Invalid date format"}), 400
+        
     
     try:
         new_pet = Pet(
+            user_id=user_id,
             img_url=data['img_url'],
             name=data['name'],
             type=data['type'],

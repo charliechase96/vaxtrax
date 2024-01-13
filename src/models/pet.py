@@ -2,6 +2,7 @@ from models.user import db
 
 class Pet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     img_url = db.Column(db.String(300))
     name = db.Column(db.String(100))
     type = db.Column(db.String(50))

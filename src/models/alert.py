@@ -6,3 +6,4 @@ class Alert(db.Model):
     due_date = db.Column(db.Date, nullable=False)
     alert_date = db.Column(db.Date, nullable=False)
     vaccine_id = db.Column(db.Integer, db.ForeignKey('vaccine.id'), nullable=False)
+    pet_id = db.Column(db.Integer, db.ForeignKey('pet.id'), nullable=False)
