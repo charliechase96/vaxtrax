@@ -20,23 +20,25 @@ function Login({onLoginSuccess}) {
             body: JSON.stringify({ email, password }),
         })
         .then(response => {
-            console.log(response)
-            if(response.ok) {
+            if (response.ok) {
                 return response.json();
             }
             throw new Error('Network response was not okay.');
         })
         .then(data => {
-            localStorage.setItem('authToken', data.access_token);
-            localStorage.setItem('user_id', data.user_id);
-
-            onLoginSuccess(data);
-            navigate('/home');
+            if (data.access_token) {
+                // Access token is present, indicating a successful login
+                onLoginSuccess(data);
+                navigate(`/${data.user_id}/home`);
+            } else {
+                setError('Failed to login');
+            }
         })
         .catch(error => {
-            setError('Failed to login')
-            console.log(error)});
-    };
+            setError('Failed to login');
+            console.error(error);
+        });
+    }
 
     return (
         <div className='login-container'>

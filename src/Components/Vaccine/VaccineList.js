@@ -1,10 +1,13 @@
 import React from "react";
 import Vaccine from "./Vaccine";
+import { fetchWithToken } from "../../Utilities/auth";
 
 function VaccineList({ pet, vaccines, setVaccines, onCreateAlert }) {
 
+    const userId = localStorage.getItem('user_id');
+
     function handleDeleteVaccine(vaccineId) {
-        fetch(`http://localhost:5000/api/delete_vaccine/${vaccineId}`, {
+        fetchWithToken(`/api/${userId}/delete_vaccine/${vaccineId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
 import Alert from "./Alert";
+import { fetchWithToken } from "../../Utilities/auth";
 
 function AlertList({alerts, setAlerts, pet }) {
+    const userId = localStorage.getItem('user_id');
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/alerts')
+        fetchWithToken(`/api/${userId}/alerts`)
             .then(response => response.json())
             .then(data => setAlerts(data))
             .catch(error => console.error('Error:', error))
-    }, [setAlerts]);
+    }, [setAlerts, userId]);
 
     function handleDeleteAlert(alertId) {
-        fetch(`http://localhost:5000/api/delete_alert/${alertId}`, {
+        fetchWithToken(`/api/${userId}/delete_alert/${alertId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

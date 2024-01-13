@@ -2,8 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import DeletePetButton from "./DeletePetButton";
 import PetProfileButton from "./PetProfileButton";
+import { fetchWithToken } from "../../Utilities/auth";
 
 function PetCard({ pet, onDelete }) {
+
+    const userId = localStorage.getItem('user_id');
+
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
 
     const dogProfilePic = "https://cdn-icons-png.flaticon.com/512/194/194279.png"
@@ -13,11 +17,11 @@ function PetCard({ pet, onDelete }) {
     const navigate = useNavigate();
 
     function handleNavigate() {
-        navigate("/home/pet-profile", { state: { pet } });
+        navigate(`/${userId}/home/${pet.id}/pet-profile`, { state: { pet } });
     }
 
     function handleDelete() {
-        fetch(`http://localhost:5000/api/delete_pet/${pet.id}`, {
+        fetchWithToken(`/api/${userId}/delete_pet/${pet.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

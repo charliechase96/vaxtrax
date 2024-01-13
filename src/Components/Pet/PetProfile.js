@@ -6,6 +6,7 @@ import CatVaccineForm from "../Vaccine/CatVaccineForm";
 import DogVaccineForm from "../Vaccine/DogVaccineForm";
 import VaccineList from "../Vaccine/VaccineList";
 import AlertList from "../Alerts/AlertList";
+import { fetchWithToken } from "../../Utilities/auth";
 
 function PetProfile() {
     const [vaccineName, setVaccineName] = useState("Vaccine");
@@ -15,6 +16,7 @@ function PetProfile() {
 
     const location = useLocation();
     const pet = location.state?.pet;
+    const userId = localStorage.getItem('user_id');
 
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
 
@@ -32,7 +34,7 @@ function PetProfile() {
             due_date: dueDate
         };
 
-        fetch('http://localhost:5000/api/add_vaccine', {
+        fetchWithToken(`/api/${userId}/add_vaccine`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,8 +58,8 @@ function PetProfile() {
         });
     }
 
-    function fetchVaccines() {
-        fetch('http://localhost:5000/api/vaccines')
+    useEffect(() => {
+        fetchWithToken(`/api/${userId}/vaccines`)
                 .then(response => {
                     if(response.ok) {
                         return response.json();
@@ -68,22 +70,14 @@ function PetProfile() {
                     console.log(data)
                     setVaccines(data)})
                 .catch(error => console.error("Fetch error", error));
-            }
-    
-    useEffect(() => {
-        fetchVaccines();
-    }, []);      
+            }, [userId]);      
 
-    function fetchAlerts() {
-        fetch('http://localhost:5000/api/alerts')
-            .then(response => response.json())
-            .then(data => setAlerts(data))
-            .catch(error => console.error("Fetch error", error));
-    }
-
-    useEffect(() => {
-        fetchAlerts();
-    }, []);
+        useEffect(() => {
+            fetchWithToken(`/api/${userId}/alerts`)
+                .then(response => response.json())
+                .then(data => setAlerts(data))
+                .catch(error => console.error("Fetch error", error));
+        }, [userId]);
 
     function calculateAlertDate(alertDay, vaccineDueDate) {
         // Convert the vaccineDueDate from a string to a Date object
@@ -119,7 +113,7 @@ function PetProfile() {
 
         console.log("Alert data to be sent:", alertData);
 
-        fetch('http://localhost:5000/api/add_alert', {
+        fetchWithToken(`/api/${userId}/add_alert`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +124,10 @@ function PetProfile() {
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetchAlerts(); // Fetch updated alerts
+                fetchWithToken(`/api/${userId}/alerts`)
+                .then(response => response.json())
+                .then(data => setAlerts(data))
+                .catch(error => console.error("Fetch error", error)); // Fetch updated alerts
             }
         })
         .catch(error => console.error("Error adding alert:", error));

@@ -27,8 +27,17 @@ function Signup({onSignupSuccess}) {
             throw new Error('Network response was not okay.');
         })
         .then(data => {
-            onSignupSuccess(data);
-            navigate('/home');
+            console.log(data)
+            if (data.accessToken) {
+                //access token is present, indicating a successful signup
+                //pass user_id to onSignupSuccess if provided
+                if (onSignupSuccess) {
+                    onSignupSuccess(data.accessToken, data.userId);
+                }
+                navigate(`/${data.userId}/home`);
+            } else {
+                setError('Failed to signup');
+            }
         })
         .catch(error => {
             setError('Failed to signup')

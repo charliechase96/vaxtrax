@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { fetchWithToken, getAccessToken } from "../../Utilities/auth";
 
 function AddPetForm() {
     const [petImgUrl, setPetImgUrl] = useState("");
@@ -6,16 +7,9 @@ function AddPetForm() {
     const [type, setType] = useState("Type");
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
-    const [userId, setUserId] = useState(null);
 
-    const authToken = localStorage.getItem('authToken');
-
-    useEffect(() => {
-        const storedUserId = localStorage.getItem('user_id');
-        if (storedUserId) {
-            setUserId(storedUserId);
-        }
-    }, []);
+    const authToken = getAccessToken();
+    const userId = localStorage.getItem('user_id');
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -34,7 +28,7 @@ function AddPetForm() {
             user_id: userId
         };
 
-        fetch('http://localhost:5000/api/add_pet', {
+        fetchWithToken('/api/add_pet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -60,6 +54,7 @@ function AddPetForm() {
             console.error("Error adding pet:", error);
         });
     }
+    
 
     return (
         <div className="add-pet-form">

@@ -1,8 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.exceptions import UnprocessableEntity
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from models.user import User, db
 from models.pet import Pet
 from models.vaccine import Vaccine
@@ -18,6 +17,9 @@ app.config.from_object(Config)
 
 migrate = Migrate(app, db)
 
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+
 db.init_app(app)
 jwt = JWTManager(app)
 CORS(app, resources={
@@ -30,19 +32,22 @@ CORS(app, resources={
         }
     })
 
-def send_email(to_email, template_id, dynamic_template_data):
+def send_email(to_email, template_id):
     message = Mail(
         from_email='alerts@vaxtrax.pet',
         to_emails=to_email
     )
     message.template_id = template_id
-    message.dynamic_template_data = dynamic_template_data
+
     try:
-        sg = SendGridAPIClient('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')
+        sg = SendGridAPIClient(app.config['SENDGRID_API_KEY'])
         response = sg.send(message)
-        return response.status_code
+        if response.status_code == 202:
+            return "Email sent successfully"
+        else:
+            return f"Email sending failed with status code {response.status_code}"
     except Exception as e:
-        print(e.message)
+        return f"Email sending failed with error: {str(e)}"
 
 def check_vaccine_alerts():
     today = date.today()
@@ -116,30 +121,43 @@ def login():
     
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity={"user_id": user.id})
-        return jsonify({
-            "access_token": access_token,
-            "user_id": user.id
-            }), 200
+        user_id = user.id
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+        return jsonify(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
     
     return jsonify({"msg": "Bad email or password"}), 401
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-    hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=16)
-    new_user = User(email=data['email'], password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'message': 'Registered successfully!'}), 201
+    try:
+        hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=16)
+        new_user = User(email=data['email'], password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
 
-@app.route('/api/add_pet', methods=['POST'])
-def add_pet():
+        access_token = create_access_token(identity=new_user.id)
+
+        send_email(new_user.email, 'd-f4402d6b25344e208bddadade9f984fc')
+
+        user_id = new_user.id
+        return jsonify({'message': 'Registered successfully!', 'userId': user_id, 'accessToken': access_token}), 201
+    
+    except Exception as e:
+        print("Error during user regirstration:", str(e))
+        db.session.rollback()
+        return jsonify({'error': 'User registration failed'}), 500
+
+
+
+@app.route('/api/<int:user_id>/add_pet', methods=['POST'])
+@jwt_required()
+def add_pet(user_id):
     data = request.get_json()
-    print("Received data:", data)
-    user_id = data.get('user_id')
-    if not user_id:
-        return jsonify({'message': 'User ID is required'}), 400
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
 
     try:
         birthday_date = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
@@ -150,12 +168,12 @@ def add_pet():
     
     try:
         new_pet = Pet(
-            user_id=user_id,
             img_url=data['img_url'],
             name=data['name'],
             type=data['type'],
             breed=data['breed'],
-            birthday=birthday_date
+            birthday=birthday_date,
+            user_id=current_user_id
         )
         db.session.add(new_pet)
         db.session.commit()
@@ -165,22 +183,33 @@ def add_pet():
         print("Error adding pet:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/pets', methods=['GET'])
-def get_pets():
-    pets = Pet.query.all()
+@app.route('/api/<int:user_id>/pets', methods=['GET'])
+@jwt_required()
+def get_pets(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
+    pets = Pet.query.filter_by(user_id=current_user_id).all()
     pet_list = [{
         'id': pet.id,
         'img_url': pet.img_url,
         'name': pet.name,
         'type': pet.type,
         'breed': pet.breed,
-        'birthday': pet.birthday.strftime("%Y-%m-%d")
+        'birthday': pet.birthday.strftime("%Y-%m-%d"),
+        'user_id': current_user_id
     } for pet in pets]
 
     return jsonify(pet_list)
 
-@app.route('/api/add_vaccine', methods=['POST'])
-def add_vaccine():
+@app.route('/api/<int:user_id>/add_vaccine', methods=['POST'])
+@jwt_required()
+def add_vaccine(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
     data = request.get_json()
 
     try:
@@ -191,6 +220,7 @@ def add_vaccine():
     
     try:
         new_vaccine = Vaccine(
+            user_id=current_user_id,
             name=data['name'],
             due_date=vaccine_due_date
         )
@@ -202,9 +232,14 @@ def add_vaccine():
         print("Error adding vaccine:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/vaccines', methods=['GET'])
-def get_vaccines():
-    vaccines = Vaccine.query.all()
+@app.route('/api/<int:user_id>/vaccines', methods=['GET'])
+@jwt_required()
+def get_vaccines(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
+    vaccines = Vaccine.query.filter_by(user_id=current_user_id).all()
     vaccine_list = [{
         'id': vaccine.id,
         'name': vaccine.name,
@@ -213,10 +248,15 @@ def get_vaccines():
 
     return jsonify(vaccine_list)
 
-@app.route('/api/delete_pet/<int:pet_id>', methods=['DELETE'])
-def delete_pet(pet_id):
+@app.route('/api/<int:user_id>/delete_pet/<int:pet_id>', methods=['DELETE'])
+@jwt_required()
+def delete_pet(user_id, pet_id):
     try:
-        pet = Pet.query.get(pet_id)
+        current_user_id = get_jwt_identity()
+        if user_id != current_user_id:
+            return jsonify({'message': 'Unauthorized access'}), 403
+    
+        pet = Pet.query.filter_by(id=pet_id, user_id=current_user_id).first()
         if pet is None:
             return jsonify({"message": "Pet not found"}), 404
 
@@ -226,10 +266,15 @@ def delete_pet(pet_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route('/api/delete_vaccine/<int:vaccine_id>', methods=['DELETE'])
-def delete_vaccine(vaccine_id):
+@app.route('/api/<int:user_id>/delete_vaccine/<int:vaccine_id>', methods=['DELETE'])
+@jwt_required()
+def delete_vaccine(user_id, vaccine_id):
     try:
-        vaccine = Vaccine.query.get(vaccine_id)
+        current_user_id = get_jwt_identity()
+        if user_id != current_user_id:
+            return jsonify({'message': 'Unauthorized access'}), 403
+        
+        vaccine = Vaccine.query.filter_by(id=vaccine_id, user_id=current_user_id).first()
         if vaccine is None:
             return jsonify({"message": "Vaccine not found"}), 404
 
@@ -240,8 +285,13 @@ def delete_vaccine(vaccine_id):
         return jsonify({"error": str(e)}), 500
 
 # Add an alert
-@app.route('/api/add_alert', methods=['POST'])
-def add_alert():
+@app.route('/api/<int:user_id>/add_alert', methods=['POST'])
+@jwt_required()
+def add_alert(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
     data = request.get_json()
     print("Received data:", data)
 
@@ -253,6 +303,7 @@ def add_alert():
         print("Extracted due_date:", vaccine_due_date)
 
         new_alert = Alert(
+            user_id=current_user_id,
             vaccine_name=vaccine_name, 
             alert_date=alert_date,
             due_date=vaccine_due_date, 
@@ -276,9 +327,14 @@ def add_alert():
         return jsonify({"error": str(e)}), 500
 
 # Get all alerts
-@app.route('/api/alerts', methods=['GET'])
-def get_alerts():
-    alerts = Alert.query.all()
+@app.route('/api/<int:user_id>/alerts', methods=['GET'])
+@jwt_required()
+def get_alerts(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
+    alerts = Alert.query.filter_by(user_id=current_user_id).all()
     alert_list = [{
         'id': alert.id,
         'vaccine_name': alert.vaccine_name,
@@ -289,10 +345,15 @@ def get_alerts():
     return jsonify(alert_list)
 
 # Delete an alert
-@app.route('/api/delete_alert/<int:alert_id>', methods=['DELETE'])
-def delete_alert(alert_id):
+@app.route('/api/<int:user_id>/delete_alert/<int:alert_id>', methods=['DELETE'])
+@jwt_required
+def delete_alert(user_id, alert_id):
     try:
-        alert = Alert.query.get(alert_id)
+        current_user_id = get_jwt_identity()
+        if user_id != current_user_id:
+            return jsonify({'message': 'Unauthorized access'}), 403
+        
+        alert = Alert.query.filter_by(id=alert_id, user_id=current_user_id).first()
         if alert is None:
             return jsonify({"message": "Alert not found"}), 404
         db.session.delete(alert)
@@ -301,12 +362,26 @@ def delete_alert(alert_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/<int:user_id>/token/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh(user_id):
+    current_user_id = get_jwt_identity()
+    if user_id != current_user_id:
+        return jsonify({'message': 'Unauthorized access'}), 403
+    
+    new_token = create_access_token(identity=current_user_id)
+    return jsonify(access_token=new_token)
 
-@app.route('/api/protected', methods=['GET'])
+
+@app.route('/api/<int:user_id>/protected', methods=['GET'])
 @jwt_required()
-def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+def protected(user_id):
+    current_user_id = get_jwt_identity()
+
+    if current_user_id == user_id:
+        return jsonify(logged_in_as=current_user_id), 200
+    else:
+        return jsonify({"message": "Unauthorized access"}), 403
 
 with app.app_context():
     db.create_all() # This line creates all SQL tables based on the models

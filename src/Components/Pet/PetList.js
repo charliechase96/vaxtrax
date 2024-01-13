@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
 import PetCard from "./PetCard";
+import { fetchWithToken } from "../../Utilities/auth";
 
 function PetList() {
     const [pets, setPets] = useState([]);
+    const userId = localStorage.getItem('user_id');
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/pets')
-            .then(response => {
-                if(response.ok) {
+        if (userId) {
+            fetchWithToken(`/api/${userId}/pets`)
+                .then(response => {
+                    if(!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
                     return response.json();
-                }
-                throw new Error('Network response was not okay.');
-            })
-            .then(data => setPets(data))
-            .catch(error => console.error("Fetch error", error));
-    }, []);
+                })
+                .then(data => setPets(data))
+                .catch(error => console.error("Fetch error", error));
+        } else {
+            console.error('userId is undefined');
+        }
+    }, [userId]);
+        
 
     const handleDeletePet = (petId) => {
         setPets(pets.filter(pet => pet.id !== petId));
