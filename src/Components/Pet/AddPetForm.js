@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { fetchWithToken, getAccessToken } from "../../Utilities/auth";
+import { fetchWithToken } from "../../Utilities/auth";
 
-function AddPetForm() {
+function AddPetForm({ pets, setPets }) {
     const [petImgUrl, setPetImgUrl] = useState("");
     const [petName, setPetName] = useState("");
-    const [type, setType] = useState("Type");
+    const [type, setType] = useState("Cat");
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
 
-    const authToken = getAccessToken();
-    const userId = localStorage.getItem('user_id');
+    const authToken = localStorage.getItem('authToken');
+    const userId = parseInt(localStorage.getItem('user_id'), 10);
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -28,7 +28,7 @@ function AddPetForm() {
             user_id: userId
         };
 
-        fetchWithToken('/api/add_pet', {
+        fetchWithToken(`/api/${userId}/add_pet`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,16 +37,16 @@ function AddPetForm() {
             body: JSON.stringify(petData),
         })
         .then(response => {
-            if (response.ok) {
+            if (response.ok || response.status === 201) {
                 return response.json();
             }
-            throw new Error('Network response was not okay.');
         })
         .then(data => {
             console.log("Pet added:", data);
+            setPets(currentPets => [...currentPets, data]);
             setPetImgUrl("");
             setPetName("");
-            setType("Type");
+            setType("Cat");
             setBreed("");
             setBirthday("");
         })

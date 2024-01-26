@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import PetCard from "./PetCard";
 import { fetchWithToken } from "../../Utilities/auth";
 
-function PetList() {
-    const [pets, setPets] = useState([]);
+function PetList({pets, setPets}) {
     const userId = localStorage.getItem('user_id');
 
     useEffect(() => {
@@ -11,7 +10,7 @@ function PetList() {
             fetchWithToken(`/api/${userId}/pets`)
                 .then(response => {
                     if(!response.ok) {
-                        return response.text().then(text => { throw new Error(text) });
+                        return response
                     }
                     return response.json();
                 })
@@ -20,11 +19,12 @@ function PetList() {
         } else {
             console.error('userId is undefined');
         }
-    }, [userId]);
+    }, [userId, setPets]);
         
 
     const handleDeletePet = (petId) => {
         setPets(pets.filter(pet => pet.id !== petId));
+        console.log(petId)
     };
 
     return (

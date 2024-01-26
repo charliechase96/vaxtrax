@@ -59,25 +59,34 @@ function PetProfile() {
     }
 
     useEffect(() => {
-        fetchWithToken(`/api/${userId}/vaccines`)
+        fetch(`http://localhost:5000/api/${userId}/vaccines`, {
+            method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+        })
                 .then(response => {
                     if(response.ok) {
                         return response.json();
-                    }
+                    } else {
                     throw new Error('Network response was not okay.');
+                    }
                 })
-                .then(data => {
-                    console.log(data)
-                    setVaccines(data)})
+                .then(data => setVaccines(data))
                 .catch(error => console.error("Fetch error", error));
-            }, [userId]);      
+            }, [userId, authToken]);      
 
         useEffect(() => {
-            fetchWithToken(`/api/${userId}/alerts`)
+            fetch(`http://localhost:5000/api/${userId}/alerts`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            })
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error));
-        }, [userId]);
+        }, [userId, authToken]);
 
     function calculateAlertDate(alertDay, vaccineDueDate) {
         // Convert the vaccineDueDate from a string to a Date object

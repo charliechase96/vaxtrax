@@ -11,7 +11,7 @@ function clearTokens() {
 }
 
 function getAccessToken() {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem('authtoken');
 }
 
 function getRefreshToken() {
@@ -38,7 +38,7 @@ function refreshAccessToken() {
             return response.json();
         })
         .then(data => {
-            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('authToken', data.accessToken);
             resolve(data.access_token);
         })
         .catch(error => {
@@ -49,22 +49,24 @@ function refreshAccessToken() {
 
 function fetchWithToken(url, options = {}) {
     return new Promise((resolve, reject) => {
-        const accessToken = getAccessToken();
+        const accessToken = localStorage.getItem('authToken');
 
         fetch(`${API_BASE_URL}${url}`, {
             ...options,
             headers: {
                 ...options.headers,
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
             }
         })
         .then(response => {
             if (response.status === 401) {
-                return refreshAccessToken().then(newAccessToken => {
+                return refreshAccessToken()
+                .then(newAccessToken => {
                     return fetch(`${API_BASE_URL}${url}`, {
-                        ...options,
                         headers: {
                             ...options.headers,
+                            'Content-Type': 'application/json',
                             Authorization: `Bearer ${newAccessToken}`
                         }
                     });

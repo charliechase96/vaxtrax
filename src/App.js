@@ -14,6 +14,7 @@ function App() {
   function handleSuccess(data) {
     localStorage.setItem('authToken', data.access_token);
     localStorage.setItem('user_id', data.user_id);
+    localStorage.setItem('refresh_token', data.refresh_token)
 
     setUserId(data.user_id);
     setIsAuthenticated(true);
@@ -35,8 +36,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
         <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
-        <Route path={`/${userId}/home`} element={isAuthenticated ? <Home /> : <Login />} />
-        <Route path={`/${userId}/home/pet-profile`} element={isAuthenticated ? <PetProfile /> : <Login />} />
+        <Route path={`/:userId/home`} element={isAuthenticated ? <Home /> : <Login />} />
+        <Route path={`/:userId/home/:petId/pet-profile`} element={isAuthenticated ? <PetProfile /> : <Login />} />
       </Routes>
     </BrowserRouter>
   );

@@ -7,6 +7,7 @@ import { fetchWithToken } from "../../Utilities/auth";
 function PetCard({ pet, onDelete }) {
 
     const userId = localStorage.getItem('user_id');
+    const petId = pet.id;
 
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
 
@@ -17,7 +18,7 @@ function PetCard({ pet, onDelete }) {
     const navigate = useNavigate();
 
     function handleNavigate() {
-        navigate(`/${userId}/home/${pet.id}/pet-profile`, { state: { pet } });
+        navigate(`/${userId}/home/${petId}/pet-profile`, { state: { pet } });
     }
 
     function handleDelete() {
