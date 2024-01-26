@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from dotenv import load_dotenv
 from models.user import User, db
 from models.pet import Pet
 from models.vaccine import Vaccine
@@ -12,8 +11,6 @@ from flask_cors import CORS
 from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-
-load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
