@@ -384,7 +384,7 @@ def protected(user_id):
         return jsonify({"message": "Unauthorized access"}), 403
 
 with app.app_context():
-    db.drop_all() # This line creates all SQL tables based on the models
+    db.create_all() # This line creates all SQL tables based on the models
 
 if __name__ == '__main__':
     app.run(debug=True)
