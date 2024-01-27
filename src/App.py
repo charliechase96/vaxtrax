@@ -11,7 +11,7 @@ from .models.user import User, db
 from .models.pet import Pet
 from .models.vaccine import Vaccine
 from .models.alert import Alert
-from config import Config
+from .config import Config
 from flask_cors import CORS
 from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
