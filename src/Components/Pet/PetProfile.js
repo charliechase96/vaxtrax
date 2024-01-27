@@ -34,7 +34,7 @@ function PetProfile() {
             due_date: dueDate
         };
 
-        fetchWithToken(`/api/${userId}/add_vaccine`, {
+        fetchWithToken(`/${userId}/add_vaccine`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ function PetProfile() {
     }
 
     useEffect(() => {
-        fetch(`https://api.vaxtrax.pet/api/${userId}/vaccines`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/vaccines`, {
             method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -77,7 +77,7 @@ function PetProfile() {
             }, [userId, authToken]);      
 
         useEffect(() => {
-            fetch(`https://api.vaxtrax.pet/api/${userId}/alerts`, {
+            fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -122,7 +122,7 @@ function PetProfile() {
 
         console.log("Alert data to be sent:", alertData);
 
-        fetchWithToken(`/api/${userId}/add_alert`, {
+        fetchWithToken(`/${userId}/add_alert`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ function PetProfile() {
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetchWithToken(`/api/${userId}/alerts`)
+                fetchWithToken(`/${userId}/alerts`)
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error)); // Fetch updated alerts

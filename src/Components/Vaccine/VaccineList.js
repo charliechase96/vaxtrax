@@ -7,7 +7,7 @@ function VaccineList({ pet, vaccines, setVaccines, onCreateAlert }) {
     const userId = localStorage.getItem('user_id');
 
     function handleDeleteVaccine(vaccineId) {
-        fetchWithToken(`/api/${userId}/delete_vaccine/${vaccineId}`, {
+        fetchWithToken(`/${userId}/delete_vaccine/${vaccineId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

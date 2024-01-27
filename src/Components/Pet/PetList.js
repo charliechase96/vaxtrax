@@ -7,7 +7,7 @@ function PetList({pets, setPets}) {
 
     useEffect(() => {
         if (userId) {
-            fetchWithToken(`/api/${userId}/pets`)
+            fetchWithToken(`/${userId}/pets`)
                 .then(response => {
                     if(!response.ok) {
                         return response

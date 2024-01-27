@@ -13,7 +13,7 @@ function Signup({onSignupSuccess}) {
 
     function handleSignup(event) {
         event.preventDefault();
-        fetch('https://api.vaxtrax.pet/api/signup', {
+        fetch('https://api.vaxtrax.pet/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

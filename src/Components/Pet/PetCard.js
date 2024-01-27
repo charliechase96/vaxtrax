@@ -22,7 +22,7 @@ function PetCard({ pet, onDelete }) {
     }
 
     function handleDelete() {
-        fetchWithToken(`/api/${userId}/delete_pet/${pet.id}`, {
+        fetchWithToken(`/${userId}/delete_pet/${pet.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

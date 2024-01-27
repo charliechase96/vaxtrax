@@ -101,7 +101,7 @@ function checkAuthentication() {
         }
     
         // Make a GET request to the protected route
-        fetch(`/api/protected`, {
+        fetch(`/protected`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`, 

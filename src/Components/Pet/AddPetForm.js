@@ -28,7 +28,7 @@ function AddPetForm({ pets, setPets }) {
             user_id: userId
         };
 
-        fetchWithToken(`/api/${userId}/add_pet`, {
+        fetchWithToken(`/${userId}/add_pet`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

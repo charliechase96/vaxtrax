@@ -12,7 +12,7 @@ function Login({onLoginSuccess}) {
 
     function handleLogin(event) {
         event.preventDefault();
-        fetch('https://api.vaxtrax.pet/api/login', {
+        fetch('https://api.vaxtrax.pet/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
