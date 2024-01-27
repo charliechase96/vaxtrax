@@ -1,4 +1,4 @@
-from models.user import db
+from .user import db
 
 class Pet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
