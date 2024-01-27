@@ -32,7 +32,7 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 db.init_app(app)
 jwt = JWTManager(app)
 CORS(app, resources={
-    r"/api/*": {
+    r"/*": {
         "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
         "methods": ["GET", "POST", "PUT", "DELETE"],
         "allow_headers": ["Content-Type", "Authorization"],
@@ -118,7 +118,7 @@ def send_due_alert_email(alert):
         'alert_date': alert.alert_date.strftime('%Y-%m-%d')
     })
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if not request.is_json:
         return jsonify({"msg": "Missing JSON in request"}), 400
@@ -137,7 +137,7 @@ def login():
     
     return jsonify({"msg": "Bad email or password"}), 401
 
-@app.route('/api/signup', methods=['POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     try:
@@ -160,7 +160,7 @@ def signup():
 
 
 
-@app.route('/api/<int:user_id>/add_pet', methods=['POST'])
+@app.route('/<int:user_id>/add_pet', methods=['POST'])
 @jwt_required()
 def add_pet(user_id):
     data = request.get_json()
@@ -192,7 +192,7 @@ def add_pet(user_id):
         print("Error adding pet:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/<int:user_id>/pets', methods=['GET'])
+@app.route('/<int:user_id>/pets', methods=['GET'])
 @jwt_required()
 def get_pets(user_id):
     current_user_id = get_jwt_identity()
@@ -212,7 +212,7 @@ def get_pets(user_id):
 
     return jsonify(pet_list)
 
-@app.route('/api/<int:user_id>/add_vaccine', methods=['POST'])
+@app.route('/<int:user_id>/add_vaccine', methods=['POST'])
 @jwt_required()
 def add_vaccine(user_id):
     current_user_id = get_jwt_identity()
@@ -241,7 +241,7 @@ def add_vaccine(user_id):
         print("Error adding vaccine:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/<int:user_id>/vaccines', methods=['GET'])
+@app.route('/<int:user_id>/vaccines', methods=['GET'])
 @jwt_required()
 def get_vaccines(user_id):
     current_user_id = get_jwt_identity()
@@ -257,7 +257,7 @@ def get_vaccines(user_id):
 
     return jsonify(vaccine_list)
 
-@app.route('/api/<int:user_id>/delete_pet/<int:pet_id>', methods=['DELETE'])
+@app.route('/<int:user_id>/delete_pet/<int:pet_id>', methods=['DELETE'])
 @jwt_required()
 def delete_pet(user_id, pet_id):
     try:
@@ -275,7 +275,7 @@ def delete_pet(user_id, pet_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route('/api/<int:user_id>/delete_vaccine/<int:vaccine_id>', methods=['DELETE'])
+@app.route('/<int:user_id>/delete_vaccine/<int:vaccine_id>', methods=['DELETE'])
 @jwt_required()
 def delete_vaccine(user_id, vaccine_id):
     try:
@@ -294,7 +294,7 @@ def delete_vaccine(user_id, vaccine_id):
         return jsonify({"error": str(e)}), 500
 
 # Add an alert
-@app.route('/api/<int:user_id>/add_alert', methods=['POST'])
+@app.route('/<int:user_id>/add_alert', methods=['POST'])
 @jwt_required()
 def add_alert(user_id):
     current_user_id = get_jwt_identity()
@@ -336,7 +336,7 @@ def add_alert(user_id):
         return jsonify({"error": str(e)}), 500
 
 # Get all alerts
-@app.route('/api/<int:user_id>/alerts', methods=['GET'])
+@app.route('/<int:user_id>/alerts', methods=['GET'])
 @jwt_required()
 def get_alerts(user_id):
     current_user_id = get_jwt_identity()
@@ -354,7 +354,7 @@ def get_alerts(user_id):
     return jsonify(alert_list)
 
 # Delete an alert
-@app.route('/api/<int:user_id>/delete_alert/<int:alert_id>', methods=['DELETE'])
+@app.route('/<int:user_id>/delete_alert/<int:alert_id>', methods=['DELETE'])
 @jwt_required
 def delete_alert(user_id, alert_id):
     try:
@@ -371,7 +371,7 @@ def delete_alert(user_id, alert_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/<int:user_id>/token/refresh', methods=['POST'])
+@app.route('/<int:user_id>/token/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh(user_id):
     current_user_id = get_jwt_identity()
@@ -382,7 +382,7 @@ def refresh(user_id):
     return jsonify(access_token=new_token)
 
 
-@app.route('/api/<int:user_id>/protected', methods=['GET'])
+@app.route('/<int:user_id>/protected', methods=['GET'])
 @jwt_required()
 def protected(user_id):
     current_user_id = get_jwt_identity()
