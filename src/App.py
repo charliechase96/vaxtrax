@@ -7,10 +7,10 @@ from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from models.user import User, db
-from models.pet import Pet
-from models.vaccine import Vaccine
-from models.alert import Alert
+from .models.user import User, db
+from .models.pet import Pet
+from .models.vaccine import Vaccine
+from .models.alert import Alert
 from config import Config
 from flask_cors import CORS
 from datetime import datetime, date, timedelta
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
 migrate = Migrate(app, db)
 
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
 
 db.init_app(app)
