@@ -59,7 +59,7 @@ function PetProfile() {
     }
 
     useEffect(() => {
-        fetch(`https://vaxtrax.pet/api/${userId}/vaccines`, {
+        fetch(`https://api.vaxtrax.pet/api/${userId}/vaccines`, {
             method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -77,7 +77,7 @@ function PetProfile() {
             }, [userId, authToken]);      
 
         useEffect(() => {
-            fetch(`https://vaxtrax.pet/api/${userId}/alerts`, {
+            fetch(`https://api.vaxtrax.pet/api/${userId}/alerts`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${authToken}`

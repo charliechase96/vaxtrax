@@ -5,7 +5,7 @@ function AlertList({alerts, setAlerts, pet }) {
     const userId = localStorage.getItem('user_id');
 
     useEffect(() => {
-        fetch(`https://vaxtrax.pet/api/${userId}/alerts`, {
+        fetch(`https://api.vaxtrax.pet/api/${userId}/alerts`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ function AlertList({alerts, setAlerts, pet }) {
     }, [setAlerts, userId]);
 
     function handleDeleteAlert(alertId) {
-        fetch(`https://vaxtrax.pet/api/${userId}/delete_alert/${alertId}`, {
+        fetch(`https://api.vaxtrax.pet/api/${userId}/delete_alert/${alertId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
