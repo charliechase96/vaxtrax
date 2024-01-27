@@ -37,7 +37,7 @@ jwt = JWTManager(app)
 CORS(app, resources={
     r"/*": {
         "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
-        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "methods": ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
         "allow_headers": ["Content-Type", "Authorization"],
         "expose_headers": ["Authorization"],
         "supports_credentials": True
