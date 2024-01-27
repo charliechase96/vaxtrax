@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, '/home/charl/Development/code/personal-projects/vaxtrax/src')
 
 import os
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,6 +17,8 @@ from flask_cors import CORS
 from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
