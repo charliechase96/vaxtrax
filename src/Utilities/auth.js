@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000'; // Base URL for your API
+const API_BASE_URL = 'https://vaxtrax.pet'; // Base URL for your API
 
 function storeTokens(tokens) {
     localStorage.setItem('access_token', tokens.accessToken);
