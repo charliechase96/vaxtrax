@@ -3,7 +3,7 @@ import React from "react";
 function Footer() {
     return (
         <div className="footer">
-            <p>© 2024 Charlie Chase Gray</p>
+            <img src="https://i.imgur.com/yt7qhEs.png" alt="Charlie Chase Productions Logo"/>
         </div>
     )
 }

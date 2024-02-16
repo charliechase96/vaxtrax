@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import Login from './Login';
 import Footer from '../Footer/Footer';
+import { checkAuthentication } from '../../Utilities/auth';
 
 
 function Signup({onSignupSuccess}) {
@@ -27,14 +28,20 @@ function Signup({onSignupSuccess}) {
             throw new Error('Network response was not okay.');
         })
         .then(data => {
-            console.log(data)
             if (data.accessToken) {
                 //access token is present, indicating a successful signup
                 //pass user_id to onSignupSuccess if provided
                 if (onSignupSuccess) {
                     onSignupSuccess(data.accessToken, data.userId);
                 }
-                navigate(`/${data.userId}/home`);
+                checkAuthentication().then(authenticated => {
+                    if (authenticated) {
+                        navigate(`/${data.userId}/home`);
+                    }
+                    else {
+                        setError('Failed to signup');
+                    }
+                });
             } else {
                 setError('Failed to signup');
             }

@@ -2,6 +2,7 @@ import React, { useState }from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Signup from './Signup';
 import Footer from '../Footer/Footer';
+import { checkAuthentication } from '../../Utilities/auth';
 
 function Login({onLoginSuccess}) {
     const [email, setEmail] = useState("");
@@ -23,20 +24,29 @@ function Login({onLoginSuccess}) {
             if (response.ok) {
                 return response.json();
             }
-            throw new Error('Network response was not okay.');
+            // throw new Error('Network response was not okay.');
+            return response.json().then(err => { throw new Error(err.message); });
         })
         .then(data => {
-            if (data.access_token) {
+            if (data.accessToken) {
                 // Access token is present, indicating a successful login
                 onLoginSuccess(data);
-                navigate(`/${data.user_id}/home`);
+                // Call checkAuthentication here
+                checkAuthentication().then(authenticated => {
+                    if (authenticated) {
+                       navigate(`/${data.user_id}/home`); 
+                    }
+                    else {
+                        setError('Failed to login');
+                    }
+                });
             } else {
                 setError('Failed to login');
             }
         })
         .catch(error => {
             setError('Failed to login');
-            console.error(error);
+            console.error("Error during fetch: ", error);
         });
     }
 

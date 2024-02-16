@@ -2,7 +2,6 @@
 import sys
 sys.path.insert(0, '/home/charl/Development/code/personal-projects/vaxtrax/src')
 
-import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
@@ -22,10 +21,6 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
 
 migrate = Migrate(app, db)
 

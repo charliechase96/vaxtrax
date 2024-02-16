@@ -11,7 +11,7 @@ function clearTokens() {
 }
 
 function getAccessToken() {
-    return localStorage.getItem('authtoken');
+    return localStorage.getItem('access_token');
 }
 
 function getRefreshToken() {
@@ -28,7 +28,7 @@ function refreshAccessToken() {
         fetch(`${API_BASE_URL}/token/refresh`, {
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${refreshToken}`
+                'Authorization': `Bearer ${refreshToken}`
             }
         })
         .then(response => {
@@ -38,8 +38,8 @@ function refreshAccessToken() {
             return response.json();
         })
         .then(data => {
-            localStorage.setItem('authToken', data.accessToken);
-            resolve(data.access_token);
+            localStorage.setItem('access_token', data.accessToken);
+            resolve(data.accessToken);
         })
         .catch(error => {
             reject(error);
@@ -47,16 +47,14 @@ function refreshAccessToken() {
     });
 }
 
-function fetchWithToken(url, options = {}) {
+function fetchWithToken(url) {
     return new Promise((resolve, reject) => {
-        const accessToken = localStorage.getItem('authToken');
+        const accessToken = localStorage.getItem('access_token');
 
         fetch(`${API_BASE_URL}${url}`, {
-            ...options,
             headers: {
-                ...options.headers,
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
+                'Authorization': `Bearer ${accessToken}`
             }
         })
         .then(response => {
@@ -65,9 +63,8 @@ function fetchWithToken(url, options = {}) {
                 .then(newAccessToken => {
                     return fetch(`${API_BASE_URL}${url}`, {
                         headers: {
-                            ...options.headers,
                             'Content-Type': 'application/json',
-                            Authorization: `Bearer ${newAccessToken}`
+                            'Authorization': `Bearer ${newAccessToken}`
                         }
                     });
                 });
@@ -93,7 +90,7 @@ function fetchWithToken(url, options = {}) {
 // Function to check if the user is authenticated
 function checkAuthentication() {
     return new Promise((resolve, reject) => {
-        const accessToken = localStorage.getItem('authToken');
+        const accessToken = localStorage.getItem('access_token');
 
         if (!accessToken) {
             reject(new Error('No access token found'));

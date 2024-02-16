@@ -4,32 +4,20 @@ import Login from './Components/Authentication/Login';
 import Signup from './Components/Authentication/Signup';
 import Home from './Components/User/Home';
 import PetProfile from './Components/Pet/PetProfile';
-import { checkAuthentication } from './Utilities/auth';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState(null);
 
   function handleSuccess(data) {
-    localStorage.setItem('authToken', data.access_token);
+    localStorage.setItem('access_token', data.accessToken);
     localStorage.setItem('user_id', data.user_id);
     localStorage.setItem('refresh_token', data.refresh_token)
 
     setUserId(data.user_id);
     setIsAuthenticated(true);
   }
-
-  useEffect(() => {
-    checkAuthentication()
-      .then((authenticated) => {
-        setIsAuthenticated(authenticated);
-      })
-      .catch((error) => {
-        console.error('Authentication error:', error);
-        setIsAuthenticated(false);
-      });
-  }, []);
 
   return (
     <BrowserRouter>
