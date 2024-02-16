@@ -28,7 +28,7 @@ function Login({onLoginSuccess}) {
             return response.json().then(err => { throw new Error(err.message); });
         })
         .then(data => {
-            if (data.accessToken) {
+            if (data.access_token) {
                 // Access token is present, indicating a successful login
                 onLoginSuccess(data);
                 // Call checkAuthentication here

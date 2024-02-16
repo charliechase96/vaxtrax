@@ -1,8 +1,8 @@
 const API_BASE_URL = 'https://api.vaxtrax.pet'; // Base URL for your API
 
 function storeTokens(tokens) {
-    localStorage.setItem('access_token', tokens.accessToken);
-    localStorage.setItem('refresh_token', tokens.refreshToken);
+    localStorage.setItem('access_token', tokens.access_token);
+    localStorage.setItem('refresh_token', tokens.refresh_token);
 }
 
 function clearTokens() {
@@ -38,8 +38,8 @@ function refreshAccessToken() {
             return response.json();
         })
         .then(data => {
-            localStorage.setItem('access_token', data.accessToken);
-            resolve(data.accessToken);
+            localStorage.setItem('access_token', data.access_token);
+            resolve(data.access_token);
         })
         .catch(error => {
             reject(error);

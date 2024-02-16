@@ -28,11 +28,11 @@ function Signup({onSignupSuccess}) {
             throw new Error('Network response was not okay.');
         })
         .then(data => {
-            if (data.accessToken) {
+            if (data.access_token) {
                 //access token is present, indicating a successful signup
                 //pass user_id to onSignupSuccess if provided
                 if (onSignupSuccess) {
-                    onSignupSuccess(data.accessToken, data.userId);
+                    onSignupSuccess(data.access_token, data.userId);
                 }
                 checkAuthentication().then(authenticated => {
                     if (authenticated) {

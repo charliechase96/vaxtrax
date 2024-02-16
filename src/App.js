@@ -11,7 +11,7 @@ function App() {
   const [userId, setUserId] = useState(null);
 
   function handleSuccess(data) {
-    localStorage.setItem('access_token', data.accessToken);
+    localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('user_id', data.user_id);
     localStorage.setItem('refresh_token', data.refresh_token)
 
