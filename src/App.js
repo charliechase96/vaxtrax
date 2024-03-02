@@ -4,7 +4,9 @@ import Login from './Components/Authentication/Login';
 import Signup from './Components/Authentication/Signup';
 import Home from './Components/User/Home';
 import PetProfile from './Components/Pet/PetProfile';
-import { useState } from 'react';
+import { useState, createContext } from 'react';
+
+export const UserContext = createContext(null);
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,15 +21,33 @@ function App() {
     setIsAuthenticated(true);
   }
 
+  function checkAuthentication() {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+        return Promise.resolve(false);
+    }
+
+    return fetch('https://api.vaxtrax.pet/verify_token', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => response.ok)
+    .catch(() => false);
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
-        <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
-        <Route path={`/:userId/home`} element={isAuthenticated ? <Home /> : <Login />} />
-        <Route path={`/:userId/home/:petId/pet-profile`} element={isAuthenticated ? <PetProfile /> : <Login />} />
-      </Routes>
-    </BrowserRouter>
+    <UserContext.Provider value={{ userId, checkAuthentication }}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
+          <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
+          <Route path={`/:userId/home`} element={isAuthenticated ? <Home /> : <Login />} />
+          <Route path={`/:userId/home/:petId/pet-profile`} element={isAuthenticated ? <PetProfile /> : <Login />} />
+        </Routes>
+      </BrowserRouter>
+    </UserContext.Provider>
   );
 }
 

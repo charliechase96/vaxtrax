@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import Login from './Login';
 import Footer from '../Footer/Footer';
-import { checkAuthentication } from '../../Utilities/auth';
+import { UserContext } from '../../App';
 
 
 function Signup({onSignupSuccess}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState('');
+
+    const { checkAuthentication } = useContext(UserContext);
 
     const navigate = useNavigate();
 

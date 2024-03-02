@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { fetchWithToken } from "../../Utilities/auth";
 
 function AddPetForm({ pets, setPets }) {
     const [petImgUrl, setPetImgUrl] = useState("");
@@ -8,7 +7,7 @@ function AddPetForm({ pets, setPets }) {
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
 
-    const authToken = localStorage.getItem('authToken');
+    const accessToken = localStorage.getItem('access_token');
     const userId = parseInt(localStorage.getItem('user_id'), 10);
 
     function handleSubmit(e) {
@@ -28,11 +27,11 @@ function AddPetForm({ pets, setPets }) {
             user_id: userId
         };
 
-        fetchWithToken(`/${userId}/add_pet`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/add_pet`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`,
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify(petData),
         })

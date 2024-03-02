@@ -1,13 +1,15 @@
-import React, { useState }from 'react';
+import React, { useContext, useState }from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Signup from './Signup';
 import Footer from '../Footer/Footer';
-import { checkAuthentication } from '../../Utilities/auth';
+import { UserContext } from '../../App';
 
 function Login({onLoginSuccess}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const { checkAuthentication } = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -20,13 +22,7 @@ function Login({onLoginSuccess}) {
             },
             body: JSON.stringify({ email, password }),
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            // throw new Error('Network response was not okay.');
-            return response.json().then(err => { throw new Error(err.message); });
-        })
+        .then(response => response.json())
         .then(data => {
             if (data.access_token) {
                 // Access token is present, indicating a successful login
@@ -37,7 +33,7 @@ function Login({onLoginSuccess}) {
                        navigate(`/${data.user_id}/home`); 
                     }
                     else {
-                        setError('Failed to login');
+                        setError('Authentication failed');
                     }
                 });
             } else {

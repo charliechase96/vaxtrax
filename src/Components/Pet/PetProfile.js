@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../App";
 import { useLocation } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -6,9 +7,9 @@ import CatVaccineForm from "../Vaccine/CatVaccineForm";
 import DogVaccineForm from "../Vaccine/DogVaccineForm";
 import VaccineList from "../Vaccine/VaccineList";
 import AlertList from "../Alerts/AlertList";
-import { fetchWithToken } from "../../Utilities/auth";
 
 function PetProfile() {
+    const { userId } = useContext(UserContext);
     const [vaccineName, setVaccineName] = useState("Vaccine");
     const [dueDate, setDueDate] = useState("");
     const [vaccines, setVaccines] = useState([]);
@@ -16,7 +17,6 @@ function PetProfile() {
 
     const location = useLocation();
     const pet = location.state?.pet;
-    const userId = localStorage.getItem('user_id');
 
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
 
@@ -34,7 +34,7 @@ function PetProfile() {
             due_date: dueDate
         };
 
-        fetchWithToken(`/${userId}/add_vaccine`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/add_vaccine`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ function PetProfile() {
 
         console.log("Alert data to be sent:", alertData);
 
-        fetchWithToken(`/${userId}/add_alert`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/add_alert`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ function PetProfile() {
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetchWithToken(`/${userId}/alerts`)
+                fetch(`https://api.vaxtrax.pet/${userId}/alerts`)
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error)); // Fetch updated alerts

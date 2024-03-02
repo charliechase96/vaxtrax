@@ -1,17 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import Vaccine from "./Vaccine";
-import { fetchWithToken } from "../../Utilities/auth";
+import { UserContext } from "../../App";
 
 function VaccineList({ pet, vaccines, setVaccines, onCreateAlert }) {
-
-    const userId = localStorage.getItem('user_id');
+    const { userId } = useContext(UserContext);
 
     function handleDeleteVaccine(vaccineId) {
-        fetchWithToken(`/${userId}/delete_vaccine/${vaccineId}`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/delete_vaccine/${vaccineId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
             }
             })
             .then(response => {

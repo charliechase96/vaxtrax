@@ -3,11 +3,11 @@ import Header from "../Header/Header";
 import Dashboard from "./Dashboard";
 import Footer from "../Footer/Footer";
 
-function Home() {
+function Home({userId}) {
     return (
         <div>
             <Header />
-            <Dashboard />
+            <Dashboard userId={userId} />
             <Footer />
         </div>
     )

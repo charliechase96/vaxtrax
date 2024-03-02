@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import PetCard from "./PetCard";
-import { fetchWithToken } from "../../Utilities/auth";
+import { UserContext } from "../../App";
 
-function PetList({pets, setPets}) {
-    const userId = localStorage.getItem('user_id');
+function PetList({ pets, setPets}) {
+    const { userId } = useContext(UserContext)
 
     useEffect(() => {
         if (userId) {
-            fetchWithToken(`/${userId}/pets`)
+            fetch(`https://api.vaxtrax.pet/${userId}/pets`)
                 .then(response => {
                     if(!response.ok) {
                         return response

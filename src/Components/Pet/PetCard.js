@@ -2,11 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import DeletePetButton from "./DeletePetButton";
 import PetProfileButton from "./PetProfileButton";
-import { fetchWithToken } from "../../Utilities/auth";
+import { useContext } from "react";
+import { UserContext } from "../../App";
 
 function PetCard({ pet, onDelete }) {
 
-    const userId = localStorage.getItem('user_id');
+    const { userId } = useContext(UserContext);
     const petId = pet.id;
 
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
@@ -22,7 +23,7 @@ function PetCard({ pet, onDelete }) {
     }
 
     function handleDelete() {
-        fetchWithToken(`/${userId}/delete_pet/${pet.id}`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/delete_pet/${pet.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

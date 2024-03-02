@@ -1,15 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import Alert from "./Alert";
+import { UserContext } from "../../App";
 
 function AlertList({alerts, setAlerts, pet }) {
-    const userId = localStorage.getItem('user_id');
+    const { userId } = useContext(UserContext);
 
     useEffect(() => {
         fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
             }
         })
             .then(response => response.json())

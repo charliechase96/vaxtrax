@@ -114,6 +114,12 @@ def send_due_alert_email(alert):
         'alert_date': alert.alert_date.strftime('%Y-%m-%d')
     })
 
+@app.route('/verify_token', methods=['GET'])
+@jwt_required()
+def verify_token():
+    current_user_id = get_jwt_identity()
+    return jsonify(user_id=current_user_id), 200
+
 @app.route('/login', methods=['POST'])
 def login():
     if not request.is_json:
