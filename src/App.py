@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_migrate import Migrate
