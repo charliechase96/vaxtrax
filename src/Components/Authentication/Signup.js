@@ -33,15 +33,13 @@ function Signup({onSignupSuccess}) {
             if (data.access_token) {
                 //access token is present, indicating a successful signup
                 //pass user_id to onSignupSuccess if provided
-                if (onSignupSuccess) {
-                    onSignupSuccess(data.access_token, data.userId);
-                }
+                onSignupSuccess(data);
                 checkAuthentication().then(authenticated => {
                     if (authenticated) {
-                        navigate(`/${data.userId}/home`);
+                        navigate(`/${data.user_id}/home`);
                     }
                     else {
-                        setError('Failed to signup');
+                        setError('Authentication failed');
                     }
                 });
             } else {
@@ -50,7 +48,7 @@ function Signup({onSignupSuccess}) {
         })
         .catch(error => {
             setError('Failed to signup')
-            console.log(error)});
+            console.error("Error during fetch: ", error)});
     };
 
     return (
