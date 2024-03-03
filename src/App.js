@@ -81,6 +81,7 @@ function App() {
         headers: {
             ...options.headers,
             'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
         },
     })
     .then(response => {

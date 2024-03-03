@@ -7,7 +7,7 @@ import { UserContext } from "../../App";
 
 function PetCard({ pet, onDelete }) {
 
-    const { userId } = useContext(UserContext);
+    const { userId, fetchWithToken } = useContext(UserContext);
     const petId = pet.id;
 
     const catProfilePic = "https://icons.veryicon.com/png/o/miscellaneous/taoist-music/cat-56.png"
@@ -23,12 +23,8 @@ function PetCard({ pet, onDelete }) {
     }
 
     function handleDelete() {
-        fetch(`https://api.vaxtrax.pet/${userId}/delete_pet/${pet.id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            },
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/delete_pet/${pet.id}`, {
+            method: 'DELETE'
         })
         .then(response => {
             if (response.ok) {

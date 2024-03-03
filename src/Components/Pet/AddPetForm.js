@@ -8,8 +8,7 @@ function AddPetForm({ setPets }) {
     const [breed, setBreed] = useState("");
     const [birthday, setBirthday] = useState("");
 
-    const accessToken = localStorage.getItem('access_token');
-    const { userId } = useContext(UserContext);
+    const { userId, fetchWithToken } = useContext(UserContext);
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -28,12 +27,8 @@ function AddPetForm({ setPets }) {
             user_id: userId
         };
 
-        fetch(`https://api.vaxtrax.pet/${userId}/add_pet`, {
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/add_pet`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`,
-            },
             body: JSON.stringify(petData),
         })
         .then(response => {

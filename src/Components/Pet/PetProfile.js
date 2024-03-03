@@ -9,7 +9,7 @@ import VaccineList from "../Vaccine/VaccineList";
 import AlertList from "../Alerts/AlertList";
 
 function PetProfile() {
-    const { userId } = useContext(UserContext);
+    const { userId, fetchWithToken } = useContext(UserContext);
     const [vaccineName, setVaccineName] = useState("Vaccine");
     const [dueDate, setDueDate] = useState("");
     const [vaccines, setVaccines] = useState([]);
@@ -24,8 +24,6 @@ function PetProfile() {
 
     const imageSrc = pet.img_url || (pet.type === "Cat" ? catProfilePic : pet.type === "Dog" ? dogProfilePic : null);
 
-    const accessToken = localStorage.getItem('access_token');
-
     function handleSubmit(e) {
         e.preventDefault()
 
@@ -34,12 +32,8 @@ function PetProfile() {
             due_date: dueDate
         };
 
-        fetch(`https://api.vaxtrax.pet/${userId}/add_vaccine`, {
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/add_vaccine`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem(accessToken)}`,
-            },
             body: JSON.stringify(vaccineData),
         })
         .then(response => {
@@ -59,36 +53,28 @@ function PetProfile() {
     }
 
     useEffect(() => {
-        fetch(`https://api.vaxtrax.pet/${userId}/vaccines`, {
-            method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                }
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/vaccines`, {
+            method: 'GET'
         })
-                .then(response => {
-                    if(response.ok) {
-                        return response.json();
-                    } else {
-                    throw new Error('Network response was not okay.');
-                    }
-                })
-                .then(data => setVaccines(data))
-                .catch(error => console.error("Fetch error", error));
-            }, [userId, accessToken]);      
+            .then(response => {
+                if(response.ok) {
+                    return response.json();
+                } else {
+                throw new Error('Network response was not okay.');
+                }
+            })
+            .then(data => setVaccines(data))
+            .catch(error => console.error("Fetch error", error));
+        }, [userId, fetchWithToken]);      
 
         useEffect(() => {
-            fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'Content-Type': 'application/json'
-                }
+            fetchWithToken(`https://api.vaxtrax.pet/${userId}/alerts`, {
+                method: 'GET'
             })
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error));
-        }, [userId, accessToken]);
+        }, [userId, fetchWithToken]);
 
     function calculateAlertDate(alertDay, vaccineDueDate) {
         // Convert the vaccineDueDate from a string to a Date object
@@ -124,22 +110,15 @@ function PetProfile() {
 
         console.log("Alert data to be sent:", alertData);
 
-        fetch(`https://api.vaxtrax.pet/${userId}/add_alert`, {
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/add_alert`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
             body: JSON.stringify(alertData),
         })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    }
+                fetchWithToken(`https://api.vaxtrax.pet/${userId}/alerts`, {
+                    method: 'GET'
                 })
                 .then(response => response.json())
                 .then(data => setAlerts(data))

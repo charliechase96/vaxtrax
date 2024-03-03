@@ -3,28 +3,20 @@ import Alert from "./Alert";
 import { UserContext } from "../../App";
 
 function AlertList({alerts, setAlerts, pet }) {
-    const { userId } = useContext(UserContext);
+    const { userId, fetchWithToken } = useContext(UserContext);
 
     useEffect(() => {
-        fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/alerts`, {
+            method: 'GET'
         })
             .then(response => response.json())
             .then(data => setAlerts(data))
             .catch(error => console.error('Error:', error))
-    }, [setAlerts, userId]);
+    }, [setAlerts, userId, fetchWithToken]);
 
     function handleDeleteAlert(alertId) {
-        fetch(`https://api.vaxtrax.pet/${userId}/delete_alert/${alertId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/delete_alert/${alertId}`, {
+            method: 'DELETE'
         })
         .then(response => {
             if (response.ok) {

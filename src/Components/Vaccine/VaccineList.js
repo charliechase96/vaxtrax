@@ -3,15 +3,11 @@ import Vaccine from "./Vaccine";
 import { UserContext } from "../../App";
 
 function VaccineList({ pet, vaccines, setVaccines, onCreateAlert }) {
-    const { userId } = useContext(UserContext);
+    const { userId, fetchWithToken } = useContext(UserContext);
 
     function handleDeleteVaccine(vaccineId) {
-        fetch(`https://api.vaxtrax.pet/${userId}/delete_vaccine/${vaccineId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            }
+        fetchWithToken(`https://api.vaxtrax.pet/${userId}/delete_vaccine/${vaccineId}`, {
+            method: 'DELETE'
             })
             .then(response => {
                 if (response.ok) {
