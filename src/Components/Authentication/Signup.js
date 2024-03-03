@@ -10,7 +10,7 @@ function Signup({onSignupSuccess}) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState('');
 
-    const { checkAuthentication } = useContext(UserContext);
+    const { checkAuthentication, setUserId, userId } = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -34,9 +34,11 @@ function Signup({onSignupSuccess}) {
                 //access token is present, indicating a successful signup
                 //pass user_id to onSignupSuccess if provided
                 onSignupSuccess(data);
+                setUserId(data.user_id)
+
                 checkAuthentication().then(authenticated => {
                     if (authenticated) {
-                        navigate(`/${data.user_id}/home`);
+                        navigate(`/${userId}/home`);
                     }
                     else {
                         setError('Authentication failed');

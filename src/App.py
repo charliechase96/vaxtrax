@@ -114,6 +114,14 @@ def send_due_alert_email(alert):
         'alert_date': alert.alert_date.strftime('%Y-%m-%d')
     })
 
+@app.route('/token_refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh_token():
+    current_user = get_jwt_identity()
+    new_access_token = create_access_token(identity=current_user)
+
+    return jsonify(access_token=new_access_token)
+
 @app.route('/verify_token', methods=['GET'])
 @jwt_required()
 def verify_token():

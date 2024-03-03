@@ -9,7 +9,7 @@ function Login({onLoginSuccess}) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const { checkAuthentication } = useContext(UserContext);
+    const { checkAuthentication, setUserId, userId } = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -27,10 +27,11 @@ function Login({onLoginSuccess}) {
             if (data.access_token) {
                 // Access token is present, indicating a successful login
                 onLoginSuccess(data);
+                setUserId(data.user_id)
                 // Call checkAuthentication here
                 checkAuthentication().then(authenticated => {
                     if (authenticated) {
-                       navigate(`/${data.user_id}/home`); 
+                       navigate(`/${userId}/home`); 
                     }
                     else {
                         setError('Authentication failed');

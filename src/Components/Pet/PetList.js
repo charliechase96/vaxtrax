@@ -1,21 +1,31 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect } from "react";
 import PetCard from "./PetCard";
-import { UserContext } from "../../App";
 
-function PetList({ pets, setPets}) {
-    const { userId } = useContext(UserContext)
+function PetList({ userId, pets, setPets}) {
 
     useEffect(() => {
         if (userId) {
-            fetch(`https://api.vaxtrax.pet/${userId}/pets`)
-                .then(response => {
-                    if(!response.ok) {
-                        return response
-                    }
-                    return response.json();
-                })
-                .then(data => setPets(data))
-                .catch(error => console.error("Fetch error", error));
+            const accessToken = localStorage.getItem('access_token');
+            
+            if (!accessToken) {
+                console.error("Access token not found");
+                return;
+            }
+
+            fetch(`https://api.vaxtrax.pet/${userId}/pets`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if(!response.ok) {
+                    return response
+                }
+                return response.json();
+            })
+            .then(data => setPets(data))
+            .catch(error => console.error("Fetch error", error));
         } else {
             console.error('userId is undefined');
         }

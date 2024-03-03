@@ -4,13 +4,28 @@ import Login from './Components/Authentication/Login';
 import Signup from './Components/Authentication/Signup';
 import Home from './Components/User/Home';
 import PetProfile from './Components/Pet/PetProfile';
-import { useState, createContext } from 'react';
+import { useState, createContext, useEffect } from 'react';
 
 export const UserContext = createContext(null);
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem('user_id') || null);
+
+  useEffect(() => {
+    function handleStorageChange() {
+      const storedUserId = localStorage.getItem("user_id");
+      if (storedUserId !== userId) {
+        setUserId(storedUserId);
+      }
+    };
+
+    window.removeEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [userId]);
 
   function handleSuccess(data) {
     localStorage.setItem('access_token', data.access_token);
@@ -38,7 +53,7 @@ function App() {
   }
 
   return (
-    <UserContext.Provider value={{ userId, checkAuthentication }}>
+    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, checkAuthentication }}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />

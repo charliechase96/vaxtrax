@@ -24,7 +24,7 @@ function PetProfile() {
 
     const imageSrc = pet.img_url || (pet.type === "Cat" ? catProfilePic : pet.type === "Dog" ? dogProfilePic : null);
 
-    const authToken = localStorage.getItem('authToken');
+    const accessToken = localStorage.getItem('access_token');
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -38,7 +38,7 @@ function PetProfile() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem(authToken)}`,
+                'Authorization': `Bearer ${localStorage.getItem(accessToken)}`,
             },
             body: JSON.stringify(vaccineData),
         })
@@ -62,7 +62,8 @@ function PetProfile() {
         fetch(`https://api.vaxtrax.pet/${userId}/vaccines`, {
             method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 }
         })
                 .then(response => {
@@ -74,19 +75,20 @@ function PetProfile() {
                 })
                 .then(data => setVaccines(data))
                 .catch(error => console.error("Fetch error", error));
-            }, [userId, authToken]);      
+            }, [userId, accessToken]);      
 
         useEffect(() => {
             fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 }
             })
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error));
-        }, [userId, authToken]);
+        }, [userId, accessToken]);
 
     function calculateAlertDate(alertDay, vaccineDueDate) {
         // Convert the vaccineDueDate from a string to a Date object
@@ -126,14 +128,19 @@ function PetProfile() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                'Authorization': `Bearer ${accessToken}`
             },
             body: JSON.stringify(alertData),
         })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetch(`https://api.vaxtrax.pet/${userId}/alerts`)
+                fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
                 .then(response => response.json())
                 .then(data => setAlerts(data))
                 .catch(error => console.error("Fetch error", error)); // Fetch updated alerts

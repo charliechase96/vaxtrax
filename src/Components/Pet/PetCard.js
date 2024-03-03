@@ -27,7 +27,7 @@ function PetCard({ pet, onDelete }) {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
             },
         })
         .then(response => {

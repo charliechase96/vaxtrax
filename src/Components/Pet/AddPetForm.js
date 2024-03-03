@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { UserContext } from "../../App";
 
-function AddPetForm({ pets, setPets }) {
+function AddPetForm({ setPets }) {
     const [petImgUrl, setPetImgUrl] = useState("");
     const [petName, setPetName] = useState("");
     const [type, setType] = useState("Cat");
@@ -8,7 +9,7 @@ function AddPetForm({ pets, setPets }) {
     const [birthday, setBirthday] = useState("");
 
     const accessToken = localStorage.getItem('access_token');
-    const userId = parseInt(localStorage.getItem('user_id'), 10);
+    const { userId } = useContext(UserContext);
 
     function handleSubmit(e) {
         e.preventDefault()
