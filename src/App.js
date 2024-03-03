@@ -52,8 +52,55 @@ function App() {
     .catch(() => false);
   }
 
+  function refreshAccessToken() {
+    return fetch('https://api.vaxtrax.pet/token_refresh', {
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to refresh access token');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.access_token) {
+            localStorage.setItem('access_token', data.access_token);
+            return data.access_token;
+        } else {
+            throw new Error('No access token returned');
+        }
+    });
+  }
+
+  function fetchWithToken(url, options) {
+    const accessToken = localStorage.getItem('access_token');
+
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    })
+    .then(response => {
+        if (response.status === 401) {
+            return refreshAccessToken().then(newAccessToken => {
+                return fetch(url, {
+                    ...options,
+                    headers: {
+                        ...options.headers,
+                        'Authorization': `Bearer ${newAccessToken}`,
+                    },
+                });
+            });
+        }
+        return response;
+    });
+  }
+
   return (
-    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, checkAuthentication }}>
+    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, checkAuthentication, fetchWithToken }}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
