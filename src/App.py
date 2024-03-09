@@ -12,10 +12,10 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 
-from models.user import User, db
-from models.pet import Pet
-from models.vaccine import Vaccine
-from models.alert import Alert
+from .models.user import User
+from .models.pet import Pet
+from .models.vaccine import Vaccine
+from .models.alert import Alert
 
 from config import Config
 
