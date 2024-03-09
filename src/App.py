@@ -37,8 +37,8 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=180)
+# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
+# app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=180)
 
 db.init_app(app)
 
@@ -168,6 +168,22 @@ class Login(Resource):
 api.add_resource(Login, '/login')
 
 
+
+class CheckSession(Resource):
+    def get(self):
+        try:
+            user_id = session.get('user_id')
+            if user_id:
+                return jsonify({'user_id': user_id})
+            else:
+                return {'message': 'User not logged in.'}, 401
+        except Exception as e:
+            # Log the exception for debugging purposes
+            print(f"An error occurred: {e}")
+            return {'message': 'An error occurred while checking the session.'}, 500
+
+# Add the CheckSession resource to your API
+api.add_resource(CheckSession, '/check_session')
 
 # @app.route('/<int:user_id>/add_pet', methods=['POST'])
 # @jwt_required()

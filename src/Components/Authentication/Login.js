@@ -9,48 +9,32 @@ function Login({onLoginSuccess}) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const { setUserId, userId, setIsAuthenticated, refreshAccessToken } = useContext(UserContext);
+    const { userId } = useContext(UserContext);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        const accessToken = localStorage.getItem('access_token');
-    
-        if (!accessToken) {
-          // if no access token, user is not logged in
-          setIsAuthenticated(false);
-          return;
-        }
-
-        fetch('https://api.vaxtrax.pet/verify_token', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json'
-            }
-          })
-          .then(response => {
-            if (response.ok) {
-                setIsAuthenticated(true);
-            }
-            else {
-                //token invalid; try refreshing it
-                return refreshAccessToken()
-            }
-          })
-          .then(success => {
-            if (!success) {
-                setIsAuthenticated(false);
-                localStorage.removeItem('access_token');
+        fetch('api.vaxtrax.pet/check_session')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('User not logged in.');
+                }
+            })
+            .then(data => {
+                if (data.user_id) {
+                    onLoginSuccess(data); // set the userId and isAutheticated state
+                } else {
+                    navigate('/');
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
                 navigate('/');
-            }
-          })
-        .catch(error => {
-            console.error('Error verifying token', error);
-            setIsAuthenticated(false);
-            navigate('/');
-        });
-    }, [navigate, setIsAuthenticated, refreshAccessToken]);
+            });
+    }, [navigate, onLoginSuccess]);
+
 
     function handleLogin(event) {
         event.preventDefault();
@@ -60,21 +44,21 @@ function Login({onLoginSuccess}) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, password }),
+            credentials: 'include' // Necessary for including cookies in the request
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.access_token) {
-                // Access token is present, indicating a successful login
-                onLoginSuccess(data);
-                // Update authentication state after successful login
-                setIsAuthenticated(true);
-                // Set userId state to that of authenticated user id
-                setUserId(data.user_id)
-                // Navigate to authenticated user home page based on user id
-                navigate(`/${userId}/home`);
+        .then(response => {
+            if (response.ok) {
+                return response.json();
             } else {
-                setError('Failed to authenticate user');
+                throw new Error('Failed to authenticate user');
             }
+        })
+        .then(data => {
+            // Update authentication state after successful login
+            // Set userId state to that of authenticated user id
+            onLoginSuccess(data)
+            // Navigate to authenticated user home page based on user id
+            navigate(`/${userId}/home`);
         })
         .catch(error => {
             setError('Failed to login');
