@@ -102,6 +102,8 @@ class EmailManager:
             'alert_date': alert.alert_date.strftime('%Y-%m-%d')
         })
 
+
+
 class Signup(Resource):
     def __init__(self, email_manager):
         self.email_manager = email_manager
@@ -126,7 +128,9 @@ class Signup(Resource):
             # Send welcome email after successful signup
             self.email_manager.send_email(email, "d-f4402d6b25344e208bddadade9f984fc", {})
 
-            return {'message': 'User created successfully.'}, 201
+            # Automatically log in the user by setting up the session
+            session['user_id'] = new_user.id
+            return {'message': 'User created and logged in successfully.'}, 201
 
         except Exception as e:
             return {'message': f'An error occurred during signup: {str(e)}'}, 500
@@ -135,6 +139,33 @@ email_manager = EmailManager(sendgrid_api_key=os.getenv('SENDGRID_API_KEY'), mai
 api.add_resource(Signup, '/signup', resource_class_args=(email_manager,))
 
 
+
+class Login(Resource):
+    def post(self):
+        if not request.is_json:
+            return jsonify({"msg": "Missing JSON in request"}), 400
+
+        email = request.json.get('email', None)
+        password = request.json.get('password', None)
+
+        if not email or not password:
+            return jsonify({"msg": "Missing email or password"}), 400
+
+        try:
+            user = User.query.filter_by(email=email).first()
+
+            if user and check_password_hash(user.password, password):
+                session['user_id'] = user.id  # Store user ID in session
+                return jsonify({"msg": "Login successful", "user_id": user.id})
+
+            else:
+                return jsonify({"msg": "Bad email or password"}), 401
+
+        except Exception as e:
+            return jsonify({"msg": f"Internal server error: {str(e)}"}), 500
+
+# Add the Login resource to your API
+api.add_resource(Login, '/login')
 
 
 
