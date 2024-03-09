@@ -11,11 +11,11 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
+from config import Config
+
 load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
-
-from config import Config
 
 from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
