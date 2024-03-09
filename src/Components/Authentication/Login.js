@@ -1,40 +1,17 @@
-import React, { useContext, useState, useEffect }from 'react';
+import React, { useContext, useState }from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Signup from './Signup';
 import Footer from '../Footer/Footer';
 import { UserContext } from '../../App';
 
-function Login({onLoginSuccess}) {
+function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const { userId } = useContext(UserContext);
+    const { userId, handleSuccess } = useContext(UserContext);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        fetch('api.vaxtrax.pet/check_session')
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('User not logged in.');
-                }
-            })
-            .then(data => {
-                if (data.user_id) {
-                    onLoginSuccess(data); // set the userId and isAutheticated state
-                } else {
-                    navigate('/');
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-                navigate('/');
-            });
-    }, [navigate, onLoginSuccess]);
-
 
     function handleLogin(event) {
         event.preventDefault();
@@ -56,7 +33,7 @@ function Login({onLoginSuccess}) {
         .then(data => {
             // Update authentication state after successful login
             // Set userId state to that of authenticated user id
-            onLoginSuccess(data)
+            handleSuccess(data)
             // Navigate to authenticated user home page based on user id
             navigate(`/${userId}/home`);
         })

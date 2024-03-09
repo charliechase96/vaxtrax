@@ -5,12 +5,12 @@ import Footer from '../Footer/Footer';
 import { UserContext } from '../../App';
 
 
-function Signup({onSignupSuccess}) {
+function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState('');
 
-    const { userId } = useContext(UserContext);
+    const { userId, handleSuccess } = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ function Signup({onSignupSuccess}) {
         .then(data => {
             if (data.user_id) {
                 //call onSignupSuccess (handleSuccess) to set userId state and isAuthenticated state
-                onSignupSuccess(data);
+                handleSuccess(data);
                 //on successful signup, navigate to homepage of user whose id matches authentication/state
                 navigate(`/${userId}/home`);
             } else {

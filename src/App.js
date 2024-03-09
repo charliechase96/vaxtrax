@@ -18,11 +18,11 @@ function App() {
   }
 
   return (
-    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId }}>
+    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, handleSuccess }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
-          <Route path="/signup" element={<Signup onSignupSuccess={handleSuccess} />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path={`/:userId/home`} element={isAuthenticated ? <Home /> : <Login />} />
           <Route path={`/:userId/home/:petId/pet-profile`} element={isAuthenticated ? <PetProfile /> : <Login />} />
         </Routes>

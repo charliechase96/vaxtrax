@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../App";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import CatVaccineForm from "../Vaccine/CatVaccineForm";
@@ -9,12 +9,13 @@ import VaccineList from "../Vaccine/VaccineList";
 import AlertList from "../Alerts/AlertList";
 
 function PetProfile() {
-    const { userId, fetchWithToken } = useContext(UserContext);
+    const { userId, handleSuccess } = useContext(UserContext);
     const [vaccineName, setVaccineName] = useState("Vaccine");
     const [dueDate, setDueDate] = useState("");
     const [vaccines, setVaccines] = useState([]);
     const [alerts, setAlerts] = useState([]);
 
+    const navigate = useNavigate()
     const location = useLocation();
     const pet = location.state?.pet;
 
@@ -32,7 +33,7 @@ function PetProfile() {
             due_date: dueDate
         };
 
-        fetchWithToken(`https://api.vaxtrax.pet/${userId}/add_vaccine`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/add_vaccine`, {
             method: 'POST',
             body: JSON.stringify(vaccineData),
         })
@@ -53,28 +54,52 @@ function PetProfile() {
     }
 
     useEffect(() => {
-        fetchWithToken(`https://api.vaxtrax.pet/${userId}/vaccines`, {
-            method: 'GET'
-        })
+        fetch('api.vaxtrax.pet/check_session')
             .then(response => {
-                if(response.ok) {
+                if (response.ok) {
                     return response.json();
                 } else {
-                throw new Error('Network response was not okay.');
+                    throw new Error('User not logged in.');
                 }
             })
-            .then(data => setVaccines(data))
-            .catch(error => console.error("Fetch error", error));
-        }, [userId, fetchWithToken]);      
-
-        useEffect(() => {
-            fetchWithToken(`https://api.vaxtrax.pet/${userId}/alerts`, {
-                method: 'GET'
+            .then(data => {
+                if (data.user_id) {
+                    handleSuccess(data); // set the userId and isAutheticated state
+                } else {
+                    navigate('/');
+                }
             })
-                .then(response => response.json())
-                .then(data => setAlerts(data))
-                .catch(error => console.error("Fetch error", error));
-        }, [userId, fetchWithToken]);
+            .catch(error => {
+                console.error('Error checking session:', error);
+                navigate('/');
+            });
+    }, [navigate, handleSuccess]);
+
+    
+    // useEffect(() => {
+    //     fetch(`https://api.vaxtrax.pet/${userId}/vaccines`, {
+    //         method: 'GET'
+    //     })
+    //         .then(response => {
+    //             if(response.ok) {
+    //                 return response.json();
+    //             } else {
+    //             throw new Error('Network response was not okay.');
+    //             }
+    //         })
+    //         .then(data => setVaccines(data))
+    //         .catch(error => console.error("Fetch error", error));
+    //     }, [userId]);      
+
+    // useEffect(() => {
+    //     fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
+    //         method: 'GET'
+    //     })
+    //         .then(response => response.json())
+    //         .then(data => setAlerts(data))
+    //         .catch(error => console.error("Fetch error", error));
+    // }, [userId]);
+
 
     function calculateAlertDate(alertDay, vaccineDueDate) {
         // Convert the vaccineDueDate from a string to a Date object
@@ -110,14 +135,14 @@ function PetProfile() {
 
         console.log("Alert data to be sent:", alertData);
 
-        fetchWithToken(`https://api.vaxtrax.pet/${userId}/add_alert`, {
+        fetch(`https://api.vaxtrax.pet/${userId}/add_alert`, {
             method: 'POST',
             body: JSON.stringify(alertData),
         })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                fetchWithToken(`https://api.vaxtrax.pet/${userId}/alerts`, {
+                fetch(`https://api.vaxtrax.pet/${userId}/alerts`, {
                     method: 'GET'
                 })
                 .then(response => response.json())
