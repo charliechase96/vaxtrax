@@ -7,21 +7,24 @@ function PetList({ userId, pets, setPets}) {
 
     useEffect(() => {
         if (userId) {
-            fetchWithToken(`https://api.vaxtrax.pet/${userId}/pets`, {
-                method: 'GET'
-            })
-            .then(response => {
-                if(!response.ok) {
-                    return response
-                }
-                return response.json();
-            })
-            .then(data => setPets(data))
-            .catch(error => console.error("Fetch error", error));
-        } else {
+            if (pets) {
+                fetchWithToken(`https://api.vaxtrax.pet/${userId}/pets`, {
+                    method: 'GET'
+                })
+                .then(response => {
+                    if(!response.ok) {
+                        return response
+                    }
+                    return response.json();
+                })
+                .then(data => setPets(data))
+                .catch(error => console.error("Fetch error", error));
+            }
+        }
+        else {
             console.error('userId is undefined');
         }
-    }, [userId, setPets, fetchWithToken]);
+    }, [userId, setPets, fetchWithToken, pets]);
         
 
     const handleDeletePet = (petId) => {

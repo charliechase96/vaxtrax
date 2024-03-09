@@ -1,4 +1,4 @@
-from .user import db
+from App import db
 
 class Pet(db.Model):
     __tablename__ = 'pets'

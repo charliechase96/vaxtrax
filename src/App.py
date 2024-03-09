@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 import os
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
-from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+import psycopg2
+
+from flask_restful import Api, Resource
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, jsonify, request, session
+from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
-from .models.user import User, db
-from .models.pet import Pet
-from .models.vaccine import Vaccine
-from .models.alert import Alert
-from .config import Config
 from flask_cors import CORS
+
+from models.user import User, db
+from models.pet import Pet
+from models.vaccine import Vaccine
+from models.alert import Alert
+
+from config import Config
+
 from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -20,13 +28,20 @@ load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
 
+api = Api(app)
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
+
 migrate = Migrate(app, db)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=180)
 
 db.init_app(app)
-jwt = JWTManager(app)
+
 CORS(app, resources={
     r"/*": {
         "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
@@ -37,144 +52,89 @@ CORS(app, resources={
         }
     })
 
-def send_email(to_email, template_id):
-    message = Mail(
-        from_email='alerts@vaxtrax.pet',
-        to_emails=to_email
-    )
-    message.template_id = template_id
+class EmailManager:
+    def __init__(self, sendgrid_api_key, mail_sender):
+        self.sendgrid_api_key = sendgrid_api_key
+        self.mail_sender = mail_sender
 
-    try:
-        sg = SendGridAPIClient(app.config['SENDGRID_API_KEY'])
-        response = sg.send(message)
-        if response.status_code == 202:
-            return "Email sent successfully"
-        else:
-            return f"Email sending failed with status code {response.status_code}"
-    except Exception as e:
-        return f"Email sending failed with error: {str(e)}"
+    def send_email(self, to_email, template_id, template_data):
+        message = Mail(
+            from_email=self.mail_sender,
+            to_emails=to_email
+        )
+        message.template_id = template_id
+        message.dynamic_template_data = template_data
 
-def check_vaccine_alerts():
-    today = date.today()
-    alerts = Alert.query.all()
+        try:
+            sg = SendGridAPIClient(self.sendgrid_api_key)
+            response = sg.send(message)
+            if response.status_code == 202:
+                return "Email sent successfully"
+            else:
+                return f"Email sending failed with status code {response.status_code}"
+        except Exception as e:
+            return f"Email sending failed with error: {str(e)}"
 
-    for alert in alerts:
-        days_until_due = (alert.due_date - today).days
+    def check_vaccine_alerts(self):
+        today = date.today()
+        alerts = Alert.query.all()
 
-        if days_until_due == 60:
-            send_sixty_day_alert_email(alert)
-        elif days_until_due == 30:
-            send_thirty_day_alert_email(alert)
-        elif days_until_due == 7:
-            send_seven_day_alert_email(alert)
-        elif days_until_due == 0:
-            send_due_alert_email(alert)
+        for alert in alerts:
+            days_until_due = (alert.due_date - today).days
 
-def send_sixty_day_alert_email(alert):
-    pet = Pet.query.get(alert.pet_id)
-    user = User.query.get(pet.user_id)
+            if days_until_due == 60:
+                self.send_vaccine_alert_email(alert, 'd-90b599178f2643a398d2f03cea421446')
+            elif days_until_due == 30:
+                self.send_vaccine_alert_email(alert, 'd-093c3d47b70f49b4a0413c2a5f55dcb8')
+            elif days_until_due == 7:
+                self.send_vaccine_alert_email(alert, 'd-56aaa70ae0ef405183b58bf12df975fb')
+            elif days_until_due == 0:
+                self.send_vaccine_alert_email(alert, 'd-82bce353b16143b1bb85cdb58e5842bf')
 
-    send_email(user.email, 'd-90b599178f2643a398d2f03cea421446', {
-        'pet_name': pet.name,
-        'vaccine_name': alert.vaccine_name,
-        'due_date': alert.due_date.strftime('%Y-%m-%d'),
-        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
-    })
+    def send_vaccine_alert_email(self, alert, template_id):
+        pet = Pet.query.get(alert.pet_id)
+        user = User.query.get(pet.user_id)
 
-def send_thirty_day_alert_email(alert):
-    pet = Pet.query.get(alert.pet_id)
-    user = User.query.get(pet.user_id)
+        self.send_email(user.email, template_id, {
+            'pet_name': pet.name,
+            'vaccine_name': alert.vaccine_name,
+            'due_date': alert.due_date.strftime('%Y-%m-%d'),
+            'alert_date': alert.alert_date.strftime('%Y-%m-%d')
+        })
 
-    send_email(user.email, 'd-093c3d47b70f49b4a0413c2a5f55dcb8', {
-        'pet_name': pet.name,
-        'vaccine_name': alert.vaccine_name,
-        'due_date': alert.due_date.strftime('%Y-%m-%d'),
-        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
-    })
+class Signup(Resource):
+    def __init__(self, email_manager):
+        self.email_manager = email_manager
 
-def send_seven_day_alert_email(alert):
-    pet = Pet.query.get(alert.pet_id)
-    user = User.query.get(pet.user_id)
+    def post(self):
+        try:
+            data = request.get_json()
+            email = data.get('email')
+            password = data.get('password')
 
-    send_email(user.email, 'd-56aaa70ae0ef405183b58bf12df975fb', {
-        'pet_name': pet.name,
-        'vaccine_name': alert.vaccine_name,
-        'due_date': alert.due_date.strftime('%Y-%m-%d'),
-        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
-    })
+            if not email or not password:
+                return {'message': 'Email and password are required.'}, 400
 
-def send_due_alert_email(alert):
-    pet = Pet.query.get(alert.pet_id)
-    user = User.query.get(pet.user_id)
+            if User.query.filter_by(email=email).first():
+                return {'message': 'Email already in use.'}, 400
 
-    send_email(user.email, 'd-82bce353b16143b1bb85cdb58e5842bf', {
-        'pet_name': pet.name,
-        'vaccine_name': alert.vaccine_name,
-        'due_date': alert.due_date.strftime('%Y-%m-%d'),
-        'alert_date': alert.alert_date.strftime('%Y-%m-%d')
-    })
+            hashed_password = generate_password_hash(password)
+            new_user = User(email=email, password_hash=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
 
-@app.route('/verify_token', methods=['GET'])
-@jwt_required()
-def verify_token():
-    current_user_id = get_jwt_identity()
-    return jsonify(user_id=current_user_id), 200
+            # Send welcome email after successful signup
+            self.email_manager.send_email(email, "d-f4402d6b25344e208bddadade9f984fc", {})
 
-@app.route('/token_refresh', methods=['POST'])
-@jwt_required(refresh=True)
-def refresh_token():
-    current_user = get_jwt_identity()
-    new_access_token = create_access_token(identity=current_user)
+            return {'message': 'User created successfully.'}, 201
 
-    return jsonify(access_token=new_access_token)
+        except Exception as e:
+            return {'message': f'An error occurred during signup: {str(e)}'}, 500
 
-@app.route('/login', methods=['POST'])
-def login():
-    if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
-    
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
-    if not email or not password:
-        return jsonify({"msg": "Missing email or password"}), 400
-    
-    user = User.query.filter_by(email=email).first()
-    if user and check_password_hash(user.password, password):
-        user_id = user.id
-        access_token = create_access_token(identity=user_id)
-        refresh_token = create_refresh_token(identity=user_id)
+email_manager = EmailManager(sendgrid_api_key=os.getenv('SENDGRID_API_KEY'), mail_sender="alerts@vaxtrax.pet")
+api.add_resource(Signup, '/signup', resource_class_args=(email_manager,))
 
-        response = jsonify(access_token=access_token, user_id=user_id)
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
-        return response
-    
-    return jsonify({"msg": "Bad email or password"}), 401
 
-@app.route('/signup', methods=['POST'])
-def signup():
-    data = request.get_json()
-    try:
-        hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256', salt_length=16)
-        new_user = User(email=data['email'], password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-
-        access_token = create_access_token(identity=new_user.id)
-        refresh_token = create_refresh_token(identity=new_user.id)
-
-        user_id = new_user.id
-
-        response = jsonify({'message': 'Registered successfully!', 'user_id': user_id, 'access_token': access_token})
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True)
-
-        send_email(new_user.email, 'd-f4402d6b25344e208bddadade9f984fc')
-
-        return response
-    
-    except Exception as e:
-        print("Error during user registration:", str(e))
-        db.session.rollback()
-        return jsonify({'error': 'User registration failed'}), 500
 
 
 

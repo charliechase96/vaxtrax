@@ -1,4 +1,4 @@
-import React, { useContext, useState }from 'react';
+import React, { useContext, useState, useEffect }from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Signup from './Signup';
 import Footer from '../Footer/Footer';
@@ -9,9 +9,48 @@ function Login({onLoginSuccess}) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const { checkAuthentication, setUserId, userId } = useContext(UserContext);
+    const { setUserId, userId, setIsAuthenticated, refreshAccessToken } = useContext(UserContext);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('access_token');
+    
+        if (!accessToken) {
+          // if no access token, user is not logged in
+          setIsAuthenticated(false);
+          return;
+        }
+
+        fetch('https://api.vaxtrax.pet/verify_token', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+                setIsAuthenticated(true);
+            }
+            else {
+                //token invalid; try refreshing it
+                return refreshAccessToken()
+            }
+          })
+          .then(success => {
+            if (!success) {
+                setIsAuthenticated(false);
+                localStorage.removeItem('access_token');
+                navigate('/');
+            }
+          })
+        .catch(error => {
+            console.error('Error verifying token', error);
+            setIsAuthenticated(false);
+            navigate('/');
+        });
+    }, [navigate, setIsAuthenticated, refreshAccessToken]);
 
     function handleLogin(event) {
         event.preventDefault();
@@ -27,18 +66,14 @@ function Login({onLoginSuccess}) {
             if (data.access_token) {
                 // Access token is present, indicating a successful login
                 onLoginSuccess(data);
+                // Update authentication state after successful login
+                setIsAuthenticated(true);
+                // Set userId state to that of authenticated user id
                 setUserId(data.user_id)
-                // Call checkAuthentication here
-                checkAuthentication().then(authenticated => {
-                    if (authenticated) {
-                       navigate(`/${userId}/home`); 
-                    }
-                    else {
-                        setError('Authentication failed');
-                    }
-                });
+                // Navigate to authenticated user home page based on user id
+                navigate(`/${userId}/home`);
             } else {
-                setError('Failed to login');
+                setError('Failed to authenticate user');
             }
         })
         .catch(error => {

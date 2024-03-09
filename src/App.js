@@ -36,22 +36,7 @@ function App() {
     setIsAuthenticated(true);
   }
 
-  function checkAuthentication() {
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-        return Promise.resolve(false);
-    }
-
-    return fetch('https://api.vaxtrax.pet/verify_token', {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => response.ok)
-    .catch(() => false);
-  }
-
+  
   function refreshAccessToken() {
     return fetch('https://api.vaxtrax.pet/token_refresh', {
         method: 'POST',
@@ -101,7 +86,7 @@ function App() {
   }
 
   return (
-    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, checkAuthentication, fetchWithToken }}>
+    <UserContext.Provider value={{ userId, setIsAuthenticated, setUserId, fetchWithToken, refreshAccessToken }}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login onLoginSuccess={handleSuccess}/>} />
