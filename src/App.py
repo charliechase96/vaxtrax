@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import os
-from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 import psycopg2
 
@@ -10,11 +8,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
 
-from .models.user import User
-from .models.pet import Pet
-from .models.vaccine import Vaccine
-from .models.alert import Alert
+load_dotenv()
+app = Flask(__name__)
+app.config.from_object(Config)
 
 from config import Config
 
@@ -22,24 +21,11 @@ from datetime import datetime, date, timedelta
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-load_dotenv()
-
-app = Flask(__name__)
-app.config.from_object(Config)
-
-api = Api(app)
-db = SQLAlchemy(app)
-
-migrate = Migrate(app, db)
-
+db = SQLAlchemy()
+api = Api()
+migrate = Migrate()
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
-# app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(minutes=180)
-
-db.init_app(app)
-
 CORS(app, resources={
     r"/*": {
         "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
@@ -49,6 +35,16 @@ CORS(app, resources={
         "supports_credentials": True
         }
     })
+
+db.init_app(app)
+migrate.init_app(app, db)
+
+from .models.user import User
+from .models.pet import Pet
+from .models.vaccine import Vaccine
+from .models.alert import Alert
+
+
 
 class EmailManager:
     def __init__(self, sendgrid_api_key, mail_sender):
@@ -415,8 +411,9 @@ api.add_resource(CheckSession, '/check_session')
 #     else:
 #         return jsonify({"message": "Unauthorized access"}), 403
 
-with app.app_context():
-    db.create_all() # This line creates all SQL tables based on the models
+ # This line creates all SQL tables based on the models
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()    
     app.run(debug=True)            
