@@ -1,4 +1,4 @@
-from App import db
+from ..App import db
 
 class User(db.Model):
     __tablename__ = 'users'

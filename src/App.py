@@ -9,7 +9,6 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, jsonify, request, session
 from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 
 from .models.user import User
@@ -30,7 +29,6 @@ app.config.from_object(Config)
 
 api = Api(app)
 db = SQLAlchemy(app)
-jwt = JWTManager(app)
 
 migrate = Migrate(app, db)
 

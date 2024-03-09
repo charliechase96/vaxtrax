@@ -1,4 +1,4 @@
-from App import db
+from ..App import db
 
 class Alert(db.Model):
     __tablename__ = 'alerts'
