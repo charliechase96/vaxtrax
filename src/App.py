@@ -1,49 +1,17 @@
-#!/usr/bin/env python3
-from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
-
-from flask_restful import Api, Resource
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, jsonify, request, session
-from flask_migrate import Migrate
-from flask_cors import CORS
-from dotenv import load_dotenv
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from .config import Config
-
-load_dotenv()
-app = Flask(__name__)
-app.config.from_object(Config)
+from flask_restful import Resource
+from flask import jsonify, request, session
 
 from datetime import datetime, date, timedelta
+
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-db = SQLAlchemy()
-api = Api()
-migrate = Migrate()
-login_manager = LoginManager()
-login_manager.init_app(app)
-CORS(app, resources={
-    r"/*": {
-        "origins": ["https://vaxtrax.pet", "http://localhost:3000"],
-        "methods": ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
-        "allow_headers": ["Content-Type", "Authorization"],
-        "expose_headers": ["Authorization"],
-        "supports_credentials": True
-        }
-    })
+from .models import User, Pet, Vaccine, Alert
 
-db.init_app(app)
-migrate.init_app(app, db)
-
-from .models.user import User
-from .models.pet import Pet
-from .models.vaccine import Vaccine
-from .models.alert import Alert
-
+from . import create_app, db, api 
 
 
 class EmailManager:
@@ -178,6 +146,16 @@ class CheckSession(Resource):
 
 # Add the CheckSession resource to your API
 api.add_resource(CheckSession, '/check_session')
+
+
+
+class Logout(Resource):
+    def delete(self):
+        # Clearing the entire session
+        session.clear()
+        return {'message': 'User successfully logged out'}, 200
+
+api.add_resource(Logout, '/logout')
 
 # @app.route('/<int:user_id>/add_pet', methods=['POST'])
 # @jwt_required()
@@ -390,30 +368,10 @@ api.add_resource(CheckSession, '/check_session')
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
 
-# @app.route('/<int:user_id>/token/refresh', methods=['POST'])
-# @jwt_required(refresh=True)
-# def refresh(user_id):
-#     current_user_id = get_jwt_identity()
-#     if user_id != current_user_id:
-#         return jsonify({'message': 'Unauthorized access'}), 403
-    
-#     new_token = create_access_token(identity=current_user_id)
-#     return jsonify(access_token=new_token)
 
-
-# @app.route('/<int:user_id>/protected', methods=['GET'])
-# @jwt_required()
-# def protected(user_id):
-#     current_user_id = get_jwt_identity()
-
-#     if current_user_id == user_id:
-#         return jsonify(logged_in_as=current_user_id), 200
-#     else:
-#         return jsonify({"message": "Unauthorized access"}), 403
-
- # This line creates all SQL tables based on the models
+app = create_app()
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()    
-    app.run(debug=True)            
+    app.run(debug=True)

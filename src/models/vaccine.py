@@ -1,4 +1,4 @@
-from src.App import db
+from .. import db
 
 class Vaccine(db.Model):
     __tablename__ = 'vaccines'
