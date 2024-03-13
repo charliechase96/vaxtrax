@@ -34,7 +34,7 @@ function Signup() {
         .then(data => {
             if (data.message === "User created and logged in successfully.") {
                 //call onSignupSuccess (handleSuccess) to set userId state and isAuthenticated state
-                handleSuccess({ user_id: data.user_id});
+                handleSuccess({ user_id: data.user_id, isAuthenticated: true});
                 //on successful signup, navigate to homepage of user whose id matches authentication/state
                 navigate(`/${userId}/home`);
             } else {

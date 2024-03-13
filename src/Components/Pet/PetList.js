@@ -2,13 +2,13 @@ import React, { useContext, useEffect } from "react";
 import PetCard from "./PetCard";
 import { UserContext } from "../../App";
 
-function PetList({ userId, pets, setPets}) {
-    const { fetchWithToken } = useContext(UserContext);
+function PetList({ pets, setPets}) {
+    const { userId } = useContext(UserContext);
 
     useEffect(() => {
         if (userId) {
             if (pets) {
-                fetchWithToken(`https://api.vaxtrax.pet/${userId}/pets`, {
+                fetch(`https://api.vaxtrax.pet/${userId}/pets`, {
                     method: 'GET'
                 })
                 .then(response => {
@@ -24,7 +24,7 @@ function PetList({ userId, pets, setPets}) {
         else {
             console.error('userId is undefined');
         }
-    }, [userId, setPets, fetchWithToken, pets]);
+    }, [userId, setPets, pets]);
         
 
     const handleDeletePet = (petId) => {
