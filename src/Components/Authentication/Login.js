@@ -31,11 +31,13 @@ function Login() {
             }
         })
         .then(data => {
-            // Update authentication state after successful login
-            // Set userId state to that of authenticated user id
-            handleSuccess(data)
-            // Navigate to authenticated user home page based on user id
-            navigate(`/${userId}/home`);
+            if (data.msg === "Login successful") {
+                // Update authentication state after successful login
+                // Set userId state to that of authenticated user id
+                handleSuccess({ user_id: data.user_id})
+                // Navigate to authenticated user home page based on user id
+                navigate(`/${userId}/home`);
+            }
         })
         .catch(error => {
             setError('Failed to login');

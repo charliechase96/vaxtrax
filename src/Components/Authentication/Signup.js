@@ -32,17 +32,17 @@ function Signup() {
             }
         })
         .then(data => {
-            if (data.user_id) {
+            if (data.message === "User created and logged in successfully.") {
                 //call onSignupSuccess (handleSuccess) to set userId state and isAuthenticated state
-                handleSuccess(data);
+                handleSuccess({ user_id: data.user_id});
                 //on successful signup, navigate to homepage of user whose id matches authentication/state
                 navigate(`/${userId}/home`);
             } else {
-                setError('Failed to signup');
+                setError(data.message || 'Failed to signup');
             }
         })
         .catch(error => {
-            setError('Failed to signup')
+            setError(error.message)
             console.error("Error during fetch: ", error)});
     };
 
