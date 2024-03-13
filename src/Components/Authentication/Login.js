@@ -34,7 +34,7 @@ function Login() {
             if (data.msg === "Login successful") {
                 // Update authentication state after successful login
                 // Set userId state to that of authenticated user id
-                handleSuccess({ user_id: data.user_id, isAuthenicated: true})
+                handleSuccess(data)
                 // Navigate to authenticated user home page based on user id
                 navigate(`/${userId}/home`);
             }
