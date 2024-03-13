@@ -1,5 +1,5 @@
 import os
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, current_user, logout_user
 
 from flask_restful import Resource
 from flask import jsonify, request, session
@@ -81,9 +81,10 @@ class Signup(Resource):
 
             if User.query.filter_by(email=email).first():
                 return {'message': 'Email already in use.'}, 400
+            
+            new_user = User(email=email)
+            new_user.set_password(password) # set hashed password
 
-            hashed_password = generate_password_hash(password)
-            new_user = User(email=email, password_hash=hashed_password)
             db.session.add(new_user)
             db.session.commit()
 
@@ -91,7 +92,7 @@ class Signup(Resource):
             self.email_manager.send_email(email, "d-f4402d6b25344e208bddadade9f984fc", {})
 
             # Automatically log in the user by setting up the session
-            session['user_id'] = new_user.id
+            login_user(new_user)
             return {'message': 'User created and logged in successfully.'}, 201
 
         except Exception as e:
@@ -104,20 +105,18 @@ api.add_resource(Signup, '/signup', resource_class_args=(email_manager,))
 
 class Login(Resource):
     def post(self):
-        if not request.is_json:
-            return jsonify({"msg": "Missing JSON in request"}), 400
-
-        email = request.json.get('email', None)
-        password = request.json.get('password', None)
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
 
         if not email or not password:
-            return jsonify({"msg": "Missing email or password"}), 400
+            return {'message': 'Email and password are required.'}, 400
 
         try:
             user = User.query.filter_by(email=email).first()
 
-            if user and check_password_hash(user.password, password):
-                session['user_id'] = user.id  # Store user ID in session
+            if user and user.check_password(password):
+                login_user(user)  # Log in the user
                 return jsonify({"msg": "Login successful", "user_id": user.id})
 
             else:
@@ -134,9 +133,8 @@ api.add_resource(Login, '/login')
 class CheckSession(Resource):
     def get(self):
         try:
-            user_id = session.get('user_id')
-            if user_id:
-                return jsonify({'user_id': user_id})
+            if current_user.is_authenticated:
+                return jsonify({'user_id': current_user.get_id()})
             else:
                 return {'message': 'User not logged in.'}, 401
         except Exception as e:
@@ -152,7 +150,7 @@ api.add_resource(CheckSession, '/check_session')
 class Logout(Resource):
     def delete(self):
         # Clearing the entire session
-        session.clear()
+        logout_user()
         return {'message': 'User successfully logged out'}, 200
 
 api.add_resource(Logout, '/logout')
